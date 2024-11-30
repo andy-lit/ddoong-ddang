@@ -6,6 +6,7 @@ import "swiper/css/bundle";
 import { Autoplay, Pagination } from "swiper/modules";
 
 import { Swiper, SwiperSlide } from "swiper/react";
+import NaverMap from "./components/NaverMap";
 
 export default function Home() {
   return (
@@ -43,10 +44,45 @@ export default function Home() {
           <div className="text-2xl mt-4 font-bold text-center">
             뚱땅뚱땅 밴드 첫공연
           </div>
-          <div className="text-sm mt-2 text-center">
+          <div className="text-sm mt-2 text-center flex items-center justify-center gap-2">
             2024년 12월 14일 오후 7시 30분
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+
+                // iOS의 경우
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                  window.location.href = `calshow://`;
+                }
+                // Android의 경우
+                else if (/Android/i.test(navigator.userAgent)) {
+                  window.location.href = `content://com.android.calendar/time/${Date.now()}`;
+                }
+                // 데스크톱의 경우 .ics 파일 다운로드
+              }}
+              className="flex items-center gap-1 text-sm hover:text-blue-500 cursor-pointer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+                />
+              </svg>
+            </a>
           </div>
           <div className="flex items-center justify-center gap-2">
+            <span className="text-sm mt-2 text-center text-gray-600">
+              @홍대 우주정거장
+            </span>
             <a
               href="nmap://search?query=홍대 우주정거장&appname=뚱땅뚱땅밴드"
               onClick={(e) => {
@@ -60,7 +96,6 @@ export default function Home() {
               }}
               className="flex items-center gap-1 text-sm mt-1 hover:text-blue-500 cursor-pointer"
             >
-              <span>@홍대 우주정거장</span>
               <img
                 src="https://i.namu.wiki/i/g1ObOjgHeGx6qsTX-DgwrwyHL8uHBhXxiPQTCu9w5M32o0po4v1ugu_ikoEIncrVO-kq3Q73lCs8MzRgH55G2A.webp"
                 alt="네이버 지도"
@@ -86,6 +121,9 @@ export default function Home() {
                 className="w-5 h-5"
               />
             </a>
+          </div>
+          <div className="p-4">
+            <NaverMap />
           </div>
 
           {/* Dynamic Island */}
