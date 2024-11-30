@@ -6,7 +6,6 @@ import "swiper/css/bundle";
 import { Autoplay, Pagination } from "swiper/modules";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import NaverMap from "./components/NaverMap";
 
 export default function Home() {
   return (
@@ -44,6 +43,14 @@ export default function Home() {
           <div className="text-2xl mt-4 font-bold text-center">
             뚱땅뚱땅 밴드 첫공연
           </div>
+          {/* <div className="flex flex-col text-gray-600">
+            <div className="text-sm mt-2 text-center flex items-center justify-center gap-2">
+              by. 관중, 승은, 유경
+            </div>
+            <div className="text-sm text-center flex items-center justify-center gap-2">
+              진우, 현우, 수진, 바름
+            </div>
+          </div> */}
           <div className="text-sm mt-2 text-center flex items-center justify-center gap-2">
             2024년 12월 14일 오후 7시 30분
             <a
@@ -122,9 +129,9 @@ export default function Home() {
               />
             </a>
           </div>
-          <div className="p-4">
+          {/* <div className="p-4">
             <NaverMap />
-          </div>
+          </div> */}
 
           {/* Dynamic Island */}
           <div className="hidden sm:block absolute top-3 z-[5] left-1/2 transform -translate-x-1/2 w-[130px] h-[30px] bg-black rounded-[30px] border border-gray-900 opacity-50" />

@@ -54,5 +54,5 @@ export default function NaverMap() {
     };
   }, []);
 
-  return <div ref={mapRef} className="w-full h-[200px] rounded-lg" />;
+  return <div ref={mapRef} className="w-full h-[300px] rounded-lg" />;
 }
