@@ -57,16 +57,26 @@ export default function Home() {
               href="#"
               onClick={(e) => {
                 e.preventDefault();
+                const eventTitle = "뚱땅뚱땅 밴드 첫공연";
+                const eventLocation = "홍대 우주정거장";
+                const eventDate = "2024-12-14T19:30:00";
 
                 // iOS의 경우
                 if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                  window.location.href = `calshow://`;
+                  const encodedTitle = encodeURIComponent(eventTitle);
+                  const encodedLocation = encodeURIComponent(eventLocation);
+                  window.location.href = `calshow://?title=${encodedTitle}&location=${encodedLocation}&startdate=${eventDate}`;
                 }
                 // Android의 경우
                 else if (/Android/i.test(navigator.userAgent)) {
-                  window.location.href = `content://com.android.calendar/time/${Date.now()}`;
+                  const startTime = new Date(eventDate).getTime();
+                  const endTime = startTime + 2 * 60 * 60 * 1000; // 2시간 후
+                  window.location.href = `content://com.android.calendar/time/${startTime}?title=${encodeURIComponent(
+                    eventTitle
+                  )}&description=공연&location=${encodeURIComponent(
+                    eventLocation
+                  )}&begin=${startTime}&end=${endTime}`;
                 }
-                // 데스크톱의 경우 .ics 파일 다운로드
               }}
               className="flex items-center gap-1 text-sm hover:text-blue-500 cursor-pointer"
             >
