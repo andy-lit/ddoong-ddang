@@ -8,14 +8,14 @@ export const metadata: Metadata = {
   title: "뚱땅뚱땅",
   description: "뚱땅뚱땅 밴드 첫공연에 함께해주세요!",
   icons: {
-    icon: "/square.png",
+    icon: "/logo-square.webp",
   },
   openGraph: {
     title: "뚱땅뚱땅",
     description: "뚱땅뚱땅 밴드 첫공연에 함께해주세요!",
     type: "website",
-    url: "https://litcorp.xyz",
-    images: ["/logo-square.png"],
+    url: "https://ddoong-ddang.vercel.app",
+    images: ["/logo-square.webp"],
   },
 };
 
@@ -29,10 +29,10 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
 
-        <meta property="og:title" content={"HLIT"} />
+        <meta property="og:title" content={"뚱땅뚱땅 밴드 첫공연"} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={"https://litcorp.xyz"} />
-        <meta property="og:image" content={"/logo-square.png"} />
+        <meta property="og:url" content={"https://ddoong-ddang.vercel.app"} />
+        <meta property="og:image" content={"/logo-square.webp"} />
         <meta
           property="og:description"
           content="뚱땅뚱땅 밴드 첫공연에 함께해주세요!"
