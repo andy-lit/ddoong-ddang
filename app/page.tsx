@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
@@ -9,6 +10,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { userInfo } from "./userInfo";
 import { musicInfo } from "./music-info";
 import { useState, useRef } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 // music.youtubeUrl이 전체 URL인 경우 (예: https://youtube.com/watch?v=abcd1234)
 // ID만 추출하는 함수를 만듭니다
@@ -22,6 +24,21 @@ export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
   const playerRefs = useRef<{ [key: string]: HTMLIFrameElement }>({});
+  const formRef = useRef<HTMLDivElement>(null);
+  console.log(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const supabase = createClient(
+    "https://syowzfsgrtqeavqvqmzf.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5b3d6ZnNncnRxZWF2cXZxbXpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1OTAwMzMsImV4cCI6MjA0ODE2NjAzM30.ZUqYrIlmzER1-IdCkRghXYllTe4PaBnM8zm2GZMOwKc"
+  );
+
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "010",
+    referrer: "",
+    companions: 1,
+    hasCompanions: false,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const togglePlay = (youtubeId: string) => {
     const player = playerRefs.current[youtubeId];
@@ -35,6 +52,60 @@ export default function Home() {
         "*"
       );
       setIsPlaying((prev) => ({ ...prev, [youtubeId]: !prev[youtubeId] }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { hasCompanions, ...body } = formData;
+      const { data, error } = await supabase
+        .from("registrations")
+        .insert([body])
+        .select("*");
+
+      if (error) throw error;
+
+      alert("신청이 완료되었습니다!");
+      setFormData({
+        name: "",
+        phone: "",
+        referrer: "",
+        companions: 0,
+        hasCompanions: false,
+      });
+    } catch (error) {
+      console.error(error);
+      alert("신청 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const formatPhoneNumber = (value: string) => {
+    // 숫자만 추출
+    const numbers = value.replace(/[^\d]/g, "");
+
+    // 숫자를 형식에 맞게 변환
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 7) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    } else {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(
+        7,
+        11
+      )}`;
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    // 최대 13자리로 제한 (010-1234-5678 형식)
+    if (formatted.length <= 13) {
+      setFormData((prev) => ({ ...prev, phone: formatted }));
     }
   };
 
@@ -263,9 +334,12 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <div className="flex flex-col items-end justify-between h-full">
                     <div>
-                      {music.title} - {music.artist}
+                      {music.title}
+                      <span className="text-sm ml-2 text-gray-600">
+                        {music.artist}
+                      </span>
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-xs text-gray-600">
                       {music.sessions.join(", ")}
                     </div>
                   </div>
@@ -294,9 +368,169 @@ export default function Home() {
             </div>
           )}
 
-          <button className="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[390px] sm:py-6 py-4 bg-black text-white sm:rounded-b-[55px]">
+          <div className="text-lg mt-12 px-4 mb-2">NOTICE</div>
+          <div className="flex flex-col px-4 items-start justify-center text-md text-gray-600 mb-8">
+            <li>
+              따뜻한 연말 공연을 위해 준비했지만, 초보 밴드이니만큼 부족한
+              모습이 보이더라도 따뜻한 격려 보내주시면 감사하겠습니다
+            </li>
+            <li>
+              공연장 공간 확보 및 원활한 행사 진행을 위해 사전 신청한 인원만
+              입장이 가능하며, 신청 가능일은 12월 3일부터 12월 5일까지입니다.
+            </li>
+            <li>
+              신청 시 입력하는 정보가 틀리지 않도록, 정확하게 확인해주세요!
+            </li>
+            <li>
+              공연비는 5,000원입니다. 열심히 잘 하라는 격려의 의미로
+              응원해주시면 감사하겠습니다
+            </li>
+            <li>
+              정보를 입력해주시면, 입금해주실 수 있도록 안내해드리겠습니다
+            </li>
+            <li>일찍오시면 앉아서 공연을 관람하실 수 있어요!</li>
+          </div>
+
+          <button
+            onClick={() =>
+              formRef.current?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[390px] sm:py-6 py-4 bg-black text-white sm:rounded-b-[55px]"
+          >
             참가 신청하기
           </button>
+
+          <div ref={formRef} className="w-full px-4 py-8 bg-gray-50">
+            <div className="text-lg mb-2">REGISTRATION</div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="name"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  이름이 어떻게 되세요?
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="이름을 입력해주세요"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                  className="p-2 border rounded"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="phone"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  전화번호가 어떻게 되세요?
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  placeholder="010-0000-0000"
+                  value={formData.phone}
+                  onChange={handlePhoneChange}
+                  className="p-2 border rounded"
+                  required
+                  maxLength={13}
+                  pattern="[0-9]{3}-[0-9]{3,4}-[0-9]{4}"
+                  title="전화번호 형식을 맞춰주세요 (예: 010-1234-5678)"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="referrer"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  누구의 지인이신가요?
+                </label>
+                <select
+                  id="referrer"
+                  value={formData.referrer}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      referrer: e.target.value,
+                    }))
+                  }
+                  className="p-2 border rounded"
+                  required
+                >
+                  <option value="">누구 지인이신가요?</option>
+                  {userInfo.map((user) => (
+                    <option key={user.name} value={user.name}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    id="hasCompanions"
+                    type="checkbox"
+                    checked={formData.hasCompanions}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        hasCompanions: e.target.checked,
+                        companions: e.target.checked ? prev.companions : 0,
+                      }));
+                    }}
+                    className="w-4 h-4"
+                  />
+                  <label
+                    htmlFor="hasCompanions"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    동반인원이 있으신가요?(본인을 제외한 인원이 있을 경우)
+                  </label>
+                </div>
+
+                {formData.hasCompanions && (
+                  <div className="flex flex-col gap-1 ml-6">
+                    <label
+                      htmlFor="companions"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      동반 인원 수(본인을 제외한 인원 수를 입력해주세요)
+                    </label>
+                    <input
+                      id="companions"
+                      type="number"
+                      min="1"
+                      placeholder="1"
+                      value={formData.companions}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          companions: parseInt(e.target.value) || 0,
+                        }))
+                      }
+                      className="p-2 border rounded"
+                      required
+                    />
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="p-3 bg-black text-white rounded disabled:bg-gray-400 mt-2"
+              >
+                {isSubmitting ? "제출 중..." : "신청하기"}
+              </button>
+            </form>
+          </div>
 
           <div className="h-16"></div>
         </div>
