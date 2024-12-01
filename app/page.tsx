@@ -120,11 +120,11 @@ export default function Home() {
             pagination={{
               clickable: true,
             }}
-            // autoplay={{
-            //   delay: 3000,
-            //   pauseOnMouseEnter: true,
-            //   stopOnLastSlide: true,
-            // }}
+            autoplay={{
+              delay: 3000,
+              pauseOnMouseEnter: true,
+              stopOnLastSlide: true,
+            }}
             className="w-[100vw] h-[65vh] sm:w-[390px] sm:h-[60vh] z-2"
           >
             {[1, 2, 3, 4, 5, 6, 7, 1].map((item, idx) => (
@@ -382,6 +382,9 @@ export default function Home() {
               정보를 입력해주시면, 입금해주실 수 있도록 안내해드리겠습니다
             </li>
             <li>일찍오시면 앉아서 공연을 관람하실 수 있어요!</li>
+            <li>
+              뚱땅뚱땅하게 예쁜 포스터를 만들어준 친구들께 이 영광을 바칩니다
+            </li>
           </div>
 
           <button
