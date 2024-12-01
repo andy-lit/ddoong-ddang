@@ -8,8 +8,36 @@ import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { userInfo } from "./userInfo";
 import { musicInfo } from "./music-info";
+import { useState, useRef } from "react";
+
+// music.youtubeUrl이 전체 URL인 경우 (예: https://youtube.com/watch?v=abcd1234)
+// ID만 추출하는 함수를 만듭니다
+const getYoutubeId = (url: string) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : url;
+};
 
 export default function Home() {
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
+  const playerRefs = useRef<{ [key: string]: HTMLIFrameElement }>({});
+
+  const togglePlay = (youtubeId: string) => {
+    const player = playerRefs.current[youtubeId];
+    if (player) {
+      // YouTube postMessage API를 사용하여 재생/일시정지 제어
+      player.contentWindow?.postMessage(
+        JSON.stringify({
+          event: "command",
+          func: isPlaying[youtubeId] ? "pauseVideo" : "playVideo",
+        }),
+        "*"
+      );
+      setIsPlaying((prev) => ({ ...prev, [youtubeId]: !prev[youtubeId] }));
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center relative ">
       <div className="flex justify-center items-center h-screen bg-white ">
@@ -193,11 +221,43 @@ export default function Home() {
                 key={music.title + idx}
                 className="flex items-center w-full justify-between gap-4 mb-2"
               >
-                <div>
+                <div className="relative">
                   <img
                     src={music.imageUrl}
                     alt={music.title}
                     className="w-16 h-16 rounded-md"
+                  />
+                  <button
+                    onClick={() => togglePlay(music.youtubeUrl)}
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-md hover:bg-opacity-50 transition-all"
+                  >
+                    {isPlaying[music.youtubeUrl] ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="white"
+                        viewBox="0 0 24 24"
+                        className="w-8 h-8"
+                      >
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="white"
+                        viewBox="0 0 24 24"
+                        className="w-8 h-8"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    )}
+                  </button>
+                  <iframe
+                    ref={(el) => {
+                      if (el) playerRefs.current[music.youtubeUrl] = el;
+                    }}
+                    src={`https://www.youtube.com/embed/${music.youtubeUrl}?enablejsapi=1`}
+                    className="hidden"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -213,6 +273,26 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          {selectedVideo && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+              onClick={() => setSelectedVideo(null)}
+            >
+              <div className="w-full h-full sm:w-[80%] sm:h-[60%] max-w-3xl p-4">
+                <div className="relative pt-[56.25%] w-full h-0">
+                  <iframe
+                    className="absolute top-0 left-0 w-full h-full"
+                    src={`https://www.youtube.com/embed/${getYoutubeId(
+                      selectedVideo
+                    )}?autoplay=1`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           <button className="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[390px] sm:py-6 py-4 bg-black text-white sm:rounded-b-[55px]">
             참가 신청하기
