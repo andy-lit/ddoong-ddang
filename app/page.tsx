@@ -20,16 +20,16 @@ const getYoutubeId = (url: string) => {
   return match && match[2].length === 11 ? match[2] : url;
 };
 
+const supabase = createClient(
+  "https://syowzfsgrtqeavqvqmzf.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5b3d6ZnNncnRxZWF2cXZxbXpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1OTAwMzMsImV4cCI6MjA0ODE2NjAzM30.ZUqYrIlmzER1-IdCkRghXYllTe4PaBnM8zm2GZMOwKc"
+);
 export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
   const playerRefs = useRef<{ [key: string]: HTMLIFrameElement }>({});
   const formRef = useRef<HTMLDivElement>(null);
   console.log(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const supabase = createClient(
-    "https://syowzfsgrtqeavqvqmzf.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5b3d6ZnNncnRxZWF2cXZxbXpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1OTAwMzMsImV4cCI6MjA0ODE2NjAzM30.ZUqYrIlmzER1-IdCkRghXYllTe4PaBnM8zm2GZMOwKc"
-  );
 
   const [formData, setFormData] = useState({
     name: "",
