@@ -6,6 +6,8 @@ import "swiper/css/bundle";
 import { Autoplay, Pagination } from "swiper/modules";
 
 import { Swiper, SwiperSlide } from "swiper/react";
+import { userInfo } from "./userInfo";
+import { musicInfo } from "./music-info";
 
 export default function Home() {
   return (
@@ -14,7 +16,7 @@ export default function Home() {
         <div
           className="relative  bg-white
           
-          sm:w-[390px] sm:h-[844px] sm:border-8   sm:border-gray-800 overflow-x-hidden overflow-y-auto   transition-all ease-in-out sm:rounded-[55px]
+          sm:w-[390px] sm:h-[844px] sm:border-8  sm:border-gray-800 overflow-x-hidden overflow-y-auto   transition-all ease-in-out sm:rounded-[55px]
           w-full h-full "
         >
           <Swiper
@@ -40,18 +42,11 @@ export default function Home() {
             ))}
           </Swiper>
 
-          <div className="text-2xl mt-4 font-bold text-center">
+          <div className="text-2xl mt-8 mb-6 font-bold text-center">
             뚱땅뚱땅 밴드 첫공연
           </div>
-          {/* <div className="flex flex-col text-gray-600">
-            <div className="text-sm mt-2 text-center flex items-center justify-center gap-2">
-              by. 관중, 승은, 유경
-            </div>
-            <div className="text-sm text-center flex items-center justify-center gap-2">
-              진우, 현우, 수진, 바름
-            </div>
-          </div> */}
-          <div className="text-sm mt-2 text-center flex items-center justify-center gap-2">
+
+          <div className="mt-2 text-center flex items-center justify-between w-full px-4 text-lg text-gray-600 gap-2">
             2024년 12월 14일 오후 7시 30분
             <a
               href="#"
@@ -86,7 +81,7 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-5 h-5"
+                className="w-6 h-6"
               >
                 <path
                   strokeLinecap="round"
@@ -96,58 +91,134 @@ export default function Home() {
               </svg>
             </a>
           </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-sm mt-2 text-center text-gray-600">
-              @홍대 우주정거장
-            </span>
-            <a
-              href="nmap://search?query=홍대 우주정거장&appname=뚱땅뚱땅밴드"
-              onClick={(e) => {
-                e.preventDefault();
-                const naverMapUrl = /Android|iPhone|iPad|iPod/i.test(
-                  navigator.userAgent
-                )
-                  ? "nmap://search?query=홍대 우주정거장&appname=뚱땅뚱땅밴드"
-                  : "https://map.naver.com/p/search/홍대%20우주정거장";
-                window.location.href = naverMapUrl;
-              }}
-              className="flex items-center gap-1 text-sm mt-1 hover:text-blue-500 cursor-pointer"
-            >
-              <img
-                src="https://i.namu.wiki/i/g1ObOjgHeGx6qsTX-DgwrwyHL8uHBhXxiPQTCu9w5M32o0po4v1ugu_ikoEIncrVO-kq3Q73lCs8MzRgH55G2A.webp"
-                alt="네이버 지도"
-                className="w-5 h-5"
-              />
-            </a>
-            <a
-              href="kakaomap://search?q=홍대 우주정거장"
-              onClick={(e) => {
-                e.preventDefault();
-                const kakaoMapUrl = /Android|iPhone|iPad|iPod/i.test(
-                  navigator.userAgent
-                )
-                  ? "kakaomap://search?q=홍대 우주정거장"
-                  : "https://map.kakao.com/?q=홍대 우주정거장";
-                window.location.href = kakaoMapUrl;
-              }}
-              className="flex items-center gap-1 text-sm mt-1 hover:text-yellow-500 cursor-pointer"
-            >
-              <img
-                src="https://play-lh.googleusercontent.com/pPTTNz433EYFurg2j__bFU5ONdMoU_bs_-yS2JLZriua3iHrksGP6XBPF5VtDPlpGcW4"
-                alt="카카오 지도"
-                className="w-5 h-5"
-              />
-            </a>
+          <div className="flex items-center justify-between w-full gap-2 px-4 text-lg text-gray-600">
+            <span className=" mt-2 text-center ">홍대 우주정거장</span>
+            <div className="flex items-center rounded-sm gap-2">
+              <a
+                href="nmap://search?query=홍대 우주정거장&appname=뚱땅뚱땅밴드"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const naverMapUrl = /Android|iPhone|iPad|iPod/i.test(
+                    navigator.userAgent
+                  )
+                    ? "nmap://search?query=홍대 우주정거장&appname=뚱땅뚱땅밴드"
+                    : "https://map.naver.com/p/search/홍대%20우주정거장";
+                  window.location.href = naverMapUrl;
+                }}
+                className="flex items-center gap-1 text-sm mt-1 hover:text-blue-500 cursor-pointer"
+              >
+                <img
+                  src="https://i.namu.wiki/i/g1ObOjgHeGx6qsTX-DgwrwyHL8uHBhXxiPQTCu9w5M32o0po4v1ugu_ikoEIncrVO-kq3Q73lCs8MzRgH55G2A.webp"
+                  alt="네이버 지도"
+                  className="w-6 h- rounded-sm"
+                />
+              </a>
+              <a
+                href="kakaomap://search?q=홍대 우주정거장"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const kakaoMapUrl = /Android|iPhone|iPad|iPod/i.test(
+                    navigator.userAgent
+                  )
+                    ? "kakaomap://search?q=홍대 우주정거장"
+                    : "https://map.kakao.com/?q=홍대 우주정거장";
+                  window.location.href = kakaoMapUrl;
+                }}
+                className="flex items-center gap-1 rounded-sm text-sm mt-1 hover:text-yellow-500 cursor-pointer"
+              >
+                <img
+                  src="https://play-lh.googleusercontent.com/pPTTNz433EYFurg2j__bFU5ONdMoU_bs_-yS2JLZriua3iHrksGP6XBPF5VtDPlpGcW4"
+                  alt="카카오 지도"
+                  className="w-6 h-6 rounded-sm"
+                />
+              </a>
+            </div>
           </div>
           {/* <div className="p-4">
             <NaverMap />
           </div> */}
 
-          {/* Dynamic Island */}
-          <div className="hidden sm:block absolute top-3 z-[5] left-1/2 transform -translate-x-1/2 w-[130px] h-[30px] bg-black rounded-[30px] border border-gray-900 opacity-50" />
+          <div className="text-lg mt-12 px-4 mb-2">SESSION</div>
+          <div className="flex flex-col px-4 items-start justify-center">
+            {userInfo.map((user, idx) => (
+              <div
+                key={user.name + idx}
+                className="flex items-center w-full justify-between gap-4 mb-2"
+              >
+                <div className="flex items-center gap-2">
+                  <img
+                    src={user.imageUrl}
+                    alt={user.name}
+                    className="w-16 h-16 rounded-md"
+                  />
 
-          {/* Gesture Bar */}
-          <div className="hidden sm:block absolute bottom-3  z-[5] left-1/2 transform -translate-x-1/2 w-[140px] h-[5px] bg-black rounded-full" />
+                  <div className="flex flex-col justify-between h-full">
+                    <div>{user.name}</div>
+                    <div className="text-sm text-gray-500">{user.session}</div>
+                  </div>
+                </div>
+                <div>
+                  <a
+                    href={`instagram://user?username=${user.instagram}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const instagramUrl = /Android|iPhone|iPad|iPod/i.test(
+                        navigator.userAgent
+                      )
+                        ? `instagram://user?username=${user.instagram}`
+                        : `https://instagram.com/${user.instagram}`;
+                      window.location.href = instagramUrl;
+                    }}
+                    className="hover:text-pink-500"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-6 h-6"
+                      fill="currentColor"
+                      strokeWidth={0.5}
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-lg mt-12 px-4 mb-2">PLAYLIST</div>
+          <div className="flex flex-col px-4 items-start justify-center">
+            {musicInfo.map((music, idx) => (
+              <div
+                key={music.title + idx}
+                className="flex items-center w-full justify-between gap-4 mb-2"
+              >
+                <div>
+                  <img
+                    src={music.imageUrl}
+                    alt={music.title}
+                    className="w-16 h-16 rounded-md"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col items-end justify-between h-full">
+                    <div>
+                      {music.title} - {music.artist}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {music.sessions.join(", ")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button className="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[390px] sm:py-6 py-4 bg-black text-white sm:rounded-b-[55px]">
+            참가 신청하기
+          </button>
+
+          <div className="h-16"></div>
         </div>
       </div>
       {/* 
