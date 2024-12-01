@@ -11,6 +11,7 @@ import { userInfo } from "./userInfo";
 import { musicInfo } from "./music-info";
 import { useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabase";
 
 // music.youtubeUrl이 전체 URL인 경우 (예: https://youtube.com/watch?v=abcd1234)
 // ID만 추출하는 함수를 만듭니다
@@ -20,10 +21,6 @@ const getYoutubeId = (url: string) => {
   return match && match[2].length === 11 ? match[2] : url;
 };
 
-const supabase = createClient(
-  "https://syowzfsgrtqeavqvqmzf.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5b3d6ZnNncnRxZWF2cXZxbXpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1OTAwMzMsImV4cCI6MjA0ODE2NjAzM30.ZUqYrIlmzER1-IdCkRghXYllTe4PaBnM8zm2GZMOwKc"
-);
 export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
@@ -332,14 +329,10 @@ export default function Home() {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex flex-col items-end justify-between h-full">
-                    <div>
-                      {music.title}
-                      <span className="text-sm ml-2 text-gray-600">
-                        {music.artist}
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-600">
+                  <div className="text-sm flex flex-col items-end justify-between h-full">
+                    <div className="">{music.title}</div>
+                    <div className="text-sm text-gray-600 ">{music.artist}</div>
+                    <div className="text-xs text-gray-400">
                       {music.sessions.join(", ")}
                     </div>
                   </div>
@@ -369,7 +362,7 @@ export default function Home() {
           )}
 
           <div className="text-lg mt-12 px-4 mb-2">NOTICE</div>
-          <div className="flex flex-col px-4 items-start justify-center text-md text-gray-600 mb-8">
+          <div className="flex flex-col px-4 items-start justify-center text-sm text-gray-600 mb-8">
             <li>
               따뜻한 연말 공연을 위해 준비했지만, 초보 밴드이니만큼 부족한
               모습이 보이더라도 따뜻한 격려 보내주시면 감사하겠습니다

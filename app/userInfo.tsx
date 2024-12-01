@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-"use client";
 export const userInfo = [
   {
     name: "관중",
