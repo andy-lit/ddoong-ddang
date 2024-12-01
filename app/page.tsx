@@ -125,7 +125,7 @@ export default function Home() {
               pauseOnMouseEnter: true,
               stopOnLastSlide: true,
             }}
-            className="w-[100vw] h-[65vh] sm:w-[390px] sm:h-[60vh] z-2"
+            className="w-[100vw] h-[70vh] sm:w-[390px] sm:h-[60vh] z-2"
           >
             {[1, 2, 3, 4, 5, 6, 7, 1].map((item, idx) => (
               <SwiperSlide key={item + idx}>
