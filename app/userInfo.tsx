@@ -23,7 +23,7 @@ export const userInfo = [
   {
     name: "수진",
     session: "Bass",
-    instagram: "froglimber",
+    instagram: "jjuujjiinnii",
   },
   {
     name: "진우",
