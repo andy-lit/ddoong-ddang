@@ -14,6 +14,8 @@ import { supabase } from "@/utils/supabase";
 
 // music.youtubeUrl이 전체 URL인 경우 (예: https://youtube.com/watch?v=abcd1234)
 // ID만 추출하는 함수를 만듭니다
+
+const STORAGE_KEY = "STORAGE_KEY";
 const getYoutubeId = (url: string) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
@@ -26,7 +28,6 @@ export default function Home() {
   const playerRefs = useRef<{ [key: string]: HTMLIFrameElement }>({});
   const formRef = useRef<HTMLDivElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  console.log(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -56,7 +57,20 @@ export default function Home() {
   const togglePlay = (youtubeId: string) => {
     const player = playerRefs.current[youtubeId];
     if (player) {
-      // YouTube postMessage API를 사용하여 재생/일시정지 제어
+      // 현재 선택된 비디오의 상태를 토글하기 전에 모든 비디오를 중지
+      Object.keys(playerRefs.current).forEach((id) => {
+        if (id !== youtubeId) {
+          playerRefs.current[id].contentWindow?.postMessage(
+            JSON.stringify({
+              event: "command",
+              func: "pauseVideo",
+            }),
+            "*"
+          );
+        }
+      });
+
+      // 선택된 비디오 재생/중지
       player.contentWindow?.postMessage(
         JSON.stringify({
           event: "command",
@@ -64,7 +78,19 @@ export default function Home() {
         }),
         "*"
       );
-      setIsPlaying((prev) => ({ ...prev, [youtubeId]: !prev[youtubeId] }));
+
+      // 모든 비디오의 상태를 false로 설정하고 현재 비디오만 토글
+      setIsPlaying((prev) => {
+        const newState = Object.keys(prev).reduce(
+          (acc: { [key: string]: boolean }, key) => {
+            acc[key] = false;
+            return acc;
+          },
+          {}
+        );
+        newState[youtubeId] = !prev[youtubeId];
+        return newState;
+      });
     }
   };
 
@@ -158,7 +184,7 @@ export default function Home() {
             뚱땅뚱땅 밴드 첫공연
           </div>
 
-          <div className="mt-2 text-center flex items-center justify-between w-full px-4 text-lg text-gray-600 gap-2">
+          <div className="mt-2 text-center flex items-center justify-between w-full px-4 text-md text-gray-600 gap-2">
             2024년 12월 14일 오후 7시 30분
             <a
               href="#"
@@ -203,7 +229,7 @@ export default function Home() {
               </svg>
             </a>
           </div>
-          <div className="flex items-center justify-between w-full gap-2 px-4 text-lg text-gray-600">
+          <div className="flex items-center justify-between w-full gap-2 px-4 text-md text-gray-600">
             <span className=" mt-2 text-center ">홍대 우주정거장</span>
             <div className="flex items-center rounded-sm gap-2">
               <a
@@ -298,7 +324,12 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="text-lg mt-12 px-4 mb-2">PLAYLIST</div>
+          <div className="flex flex-row items-center justify-between mt-12 px-4 mb-2">
+            <div className="text-lg ">PLAYLIST</div>
+            <div className=" font-light text-xs  ">
+              재생까지 조금 시간이 걸릴 수 있어요
+            </div>
+          </div>
           <div className="flex flex-col px-4 items-start justify-center">
             {musicInfo.map((music, idx) => (
               <div
