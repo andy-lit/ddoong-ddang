@@ -9,7 +9,7 @@ import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { userInfo } from "./userInfo";
 import { musicInfo } from "./music-info";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 
 // music.youtubeUrl이 전체 URL인 경우 (예: https://youtube.com/watch?v=abcd1234)
@@ -25,6 +25,7 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
   const playerRefs = useRef<{ [key: string]: HTMLIFrameElement }>({});
   const formRef = useRef<HTMLDivElement>(null);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
   console.log(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
   const [formData, setFormData] = useState({
@@ -35,6 +36,22 @@ export default function Home() {
     hasCompanions: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
+  useEffect(() => {
+    if (!submitButtonRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsFormVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(submitButtonRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   const togglePlay = (youtubeId: string) => {
     const player = playerRefs.current[youtubeId];
@@ -361,41 +378,42 @@ export default function Home() {
           )}
 
           <div className="text-lg mt-12 px-4 mb-2">NOTICE</div>
-          <div className="flex flex-col px-4 items-start justify-center text-sm text-gray-600 mb-8">
-            <li>
-              따뜻한 연말 공연을 위해 준비했지만, 초보 밴드이니만큼 부족한
-              모습이 보이더라도 따뜻한 격려 보내주시면 감사하겠습니다
-            </li>
-            <li>
-              공연장 공간 확보 및 원활한 행사 진행을 위해 사전 신청한 인원만
-              입장이 가능하며, 신청 가능일은 12월 3일부터 12월 5일까지입니다.
-            </li>
-            <li>
+          <div className="flex flex-col px-4 items-start justify-center text-sm text-gray-600 mb-8 gap-2">
+            <div>
+              - 소중한 주말에 시간 내어주셔서 감사합니다. 최선을 다해 좋은 시간
+              되실 수 있게 노력하겠습니다.
+            </div>
+            <div>
+              - 다만 초보 밴드이니만큼 부족한 모습이 보이더라도 따뜻한 격려
+              보내주시면 감사하겠습니다
+            </div>
+            <div>
+              - 공연장 공간 확보 및 원활한 행사 진행을 위해{" "}
+              <b>사전 신청한 인원만 입장이 가능</b>합니다.
+            </div>
+            <div>
+              - 신청 가능일은 <b>12월 3일(화)부터 12월 4일(수)</b>까지입니다.
               신청 시 입력하는 정보가 틀리지 않도록, 정확하게 확인해주세요!
-            </li>
-            <li>
-              공연비는 5,000원입니다. 열심히 잘 하라는 격려의 의미로
-              응원해주시면 감사하겠습니다
-            </li>
-            <li>
-              정보를 입력해주시면, 입금해주실 수 있도록 안내해드리겠습니다
-            </li>
-            <li>일찍오시면 앉아서 공연을 관람하실 수 있어요!</li>
-            <li>
-              뚱땅뚱땅하게 예쁜 포스터를 만들어준 친구들께 이 영광을 바칩니다
-            </li>
+            </div>
+            <div>
+              - <b>공연 참여 확정의 절차로 5,000원</b> 입금 부탁드립니다. 1잔의
+              Free Drink와 멋진 공연으로 돌려드리겠습니다
+            </div>
+            <div>
+              - 공연이 종료된 후 해당 공간에서 <b>송년회겸 뒤풀이</b>를 진행할
+              예정이니 모두 즐겁게 즐겨주세요
+            </div>
+            <div>
+              - 오시는 순서대로 입장을 도와드릴 예정이며,{" "}
+              <b>먼저 오시는 분들은 앉아서 관람</b>하실 수 있다는 고급정보를
+              전달드립니다
+            </div>
+            <div>
+              - 뚱땅뚱땅하게 예쁜 포스터를 만들어준 친구들께 이 영광을 바칩니다
+            </div>
           </div>
 
-          <button
-            onClick={() =>
-              formRef.current?.scrollIntoView({ behavior: "smooth" })
-            }
-            className="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[390px] sm:py-6 py-4 bg-black text-white sm:rounded-b-[55px]"
-          >
-            참가 신청하기
-          </button>
-
-          <div ref={formRef} className="w-full px-4 py-8 bg-gray-50">
+          <div ref={formRef} className="w-full px-4 pt-8 bg-gray-50">
             <div className="text-lg mb-2">REGISTRATION</div>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
@@ -520,6 +538,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={isSubmitting}
+                ref={submitButtonRef}
                 className="p-3 bg-black text-white rounded disabled:bg-gray-400 mt-2"
               >
                 {isSubmitting ? "제출 중..." : "신청하기"}
@@ -527,7 +546,21 @@ export default function Home() {
             </form>
           </div>
 
-          <div className="h-16"></div>
+          {!isFormVisible && (
+            <button
+              onClick={() =>
+                formRef.current?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[390px] sm:py-6 py-4 bg-black text-white sm:rounded-b-[55px]"
+            >
+              참가 신청하기
+            </button>
+          )}
+
+          <div className="flex flex-col justify-center align-items font-light text-center text-xs py-4 ">
+            <div>Copyright © 2024 DDOONG DDANG BAND.</div>
+            <div> All rights reserved.</div>
+          </div>
         </div>
       </div>
       {/* 
