@@ -696,7 +696,7 @@ export default function Home() {
               )}
 
               {isConfirmationVisible ? (
-                confirmed ? null : (
+                hasStoredData ? null : (
                   <button
                     type="submit"
                     disabled={isSubmitting}
