@@ -15,6 +15,15 @@ import { supabase } from "@/utils/supabase";
 // music.youtubeUrl이 전체 URL인 경우 (예: https://youtube.com/watch?v=abcd1234)
 // ID만 추출하는 함수를 만듭니다
 
+interface RegisteralInfo {
+  id: string;
+  name: string;
+  phone: string;
+  referrer: string;
+  companions: number;
+  confirmed: boolean;
+}
+
 const STORAGE_KEY = "STORAGE_KEY";
 const getYoutubeId = (url: string) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -25,9 +34,12 @@ const getYoutubeId = (url: string) => {
 export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
+
+  const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
   const playerRefs = useRef<{ [key: string]: HTMLIFrameElement }>({});
   const formRef = useRef<HTMLDivElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const [confirmed, setConfirmed] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -38,6 +50,23 @@ export default function Home() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+
+  useEffect(() => {
+    const storedInfo = localStorage.getItem(STORAGE_KEY);
+    if (storedInfo) {
+      supabase
+        .from("registrations")
+        .select("*")
+        .eq("id", JSON.parse(storedInfo).id)
+        .then(({ data }) => {
+          const registrationInfo = data?.[0];
+          if (!registrationInfo) return;
+          setFormData(registrationInfo);
+          setIsConfirmationVisible(true);
+          setConfirmed(registrationInfo.confirmed);
+        });
+    }
+  }, []);
 
   useEffect(() => {
     if (!submitButtonRef.current) return;
@@ -107,14 +136,10 @@ export default function Home() {
 
       if (error) throw error;
 
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data[0]));
+      setIsConfirmationVisible(true);
+
       alert("신청이 완료되었습니다!");
-      setFormData({
-        name: "",
-        phone: "",
-        referrer: "",
-        companions: 0,
-        hasCompanions: false,
-      });
     } catch (error) {
       console.error(error);
       alert("신청 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -445,136 +470,206 @@ export default function Home() {
           </div>
 
           <div ref={formRef} className="w-full px-4 pt-8 bg-gray-50">
-            <div className="text-lg mb-2">REGISTRATION</div>
+            <div className="text-lg mb-2">
+              {isConfirmationVisible ? "CHECK-IN" : "REGISTRATION"}
+            </div>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="name"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  이름이 어떻게 되세요?
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="이름을 입력해주세요"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  className="p-2 border rounded"
-                  required
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="phone"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  전화번호가 어떻게 되세요?
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  placeholder="010-0000-0000"
-                  value={formData.phone}
-                  onChange={handlePhoneChange}
-                  className="p-2 border rounded"
-                  required
-                  maxLength={13}
-                  pattern="[0-9]{3}-[0-9]{3,4}-[0-9]{4}"
-                  title="전화번호 형식을 맞춰주세요 (예: 010-1234-5678)"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="referrer"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  누구의 지인이신가요?
-                </label>
-                <select
-                  id="referrer"
-                  value={formData.referrer}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      referrer: e.target.value,
-                    }))
-                  }
-                  className="p-2 border rounded"
-                  required
-                >
-                  <option value="">누구 지인이신가요?</option>
-                  {userInfo.map((user) => (
-                    <option key={user.name} value={user.name}>
-                      {user.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <input
-                    id="hasCompanions"
-                    type="checkbox"
-                    checked={formData.hasCompanions}
-                    onChange={(e) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        hasCompanions: e.target.checked,
-                        companions: e.target.checked ? prev.companions : 0,
-                      }));
-                    }}
-                    className="w-4 h-4"
-                  />
-                  <label
-                    htmlFor="hasCompanions"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    동반인원이 있으신가요?(본인을 제외한 인원이 있을 경우)
-                  </label>
-                </div>
-
-                {formData.hasCompanions && (
-                  <div className="flex flex-col gap-1 ml-6">
+              {isConfirmationVisible ? (
+                <>
+                  <div>
+                    <b>{formData.name}님</b>{" "}
+                    {formData.companions > 0
+                      ? `외 ${formData.companions}명 님의`
+                      : ""}
+                    참가 {confirmed ? "확정" : "신청"}이 완료 되었습니다!
+                  </div>
+                  {!confirmed && (
+                    <>
+                      <img src="/qr.png" alt="QR Code" className="w-full" />
+                      <button
+                        className="w-full py-2 bg-black text-white"
+                        onClick={() => {
+                          window.open(
+                            "https://qr.kakaopay.com/Ej8bOmDb69c409360",
+                            "_blank"
+                          );
+                        }}
+                      >
+                        입금하기
+                      </button>
+                      <div className="text-sm text-gray-600 gap-2">
+                        <div>
+                          - 참여 확정을 위해 5,000원을 입금 부탁드립니다.{" "}
+                          <span className="line-through">
+                            후원의 의미로 더 주신다면, 그건 정말 감사합니다
+                          </span>
+                        </div>
+                        <div>
+                          - 위의 입금하기 버튼을 누르거나 QR 코드를 통해 입금을
+                          완료해주세요!
+                        </div>
+                        <div>
+                          - 입금 확인이 수동으로 이뤄지는 관계로 즉각 반영되지는
+                          않지만, 공연날까지는 확정 안내문을 보실 수 있도록
+                          할게요!
+                        </div>
+                        <div>
+                          - 문제가 생길 경우 기재해주신 연락처로 연락을
+                          드리겠습니다! 혹은 밴드 내 지인을 통해 연락드리도록
+                          하겠습니다!
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-1">
                     <label
-                      htmlFor="companions"
+                      htmlFor="name"
                       className="text-sm font-medium text-gray-700"
                     >
-                      동반 인원 수(본인을 제외한 인원 수를 입력해주세요)
+                      이름이 어떻게 되세요?
                     </label>
                     <input
-                      id="companions"
-                      type="number"
-                      min="1"
-                      placeholder="1"
-                      value={formData.companions}
+                      id="name"
+                      type="text"
+                      placeholder="이름을 입력해주세요"
+                      value={formData.name}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          companions: parseInt(e.target.value) || 0,
+                          name: e.target.value,
                         }))
                       }
                       className="p-2 border rounded"
                       required
                     />
                   </div>
-                )}
-              </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                ref={submitButtonRef}
-                className="p-3 bg-black text-white rounded disabled:bg-gray-400 mt-2"
-              >
-                {isSubmitting ? "제출 중..." : "신청하기"}
-              </button>
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor="phone"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      전화번호가 어떻게 되세요?
+                    </label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      placeholder="010-0000-0000"
+                      value={formData.phone}
+                      onChange={handlePhoneChange}
+                      className="p-2 border rounded"
+                      required
+                      maxLength={13}
+                      pattern="[0-9]{3}-[0-9]{3,4}-[0-9]{4}"
+                      title="전화번호 형식을 맞춰주세요 (예: 010-1234-5678)"
+                    />
+                  </div>
+                </>
+              )}
+
+              {!isConfirmationVisible && (
+                <>
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor="referrer"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      누구의 지인이신가요?
+                    </label>
+                    <select
+                      id="referrer"
+                      value={formData.referrer}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          referrer: e.target.value,
+                        }))
+                      }
+                      className="p-2 border rounded"
+                      required
+                    >
+                      <option value="">누구 지인이신가요?</option>
+                      {userInfo.map((user) => (
+                        <option key={user.name} value={user.name}>
+                          {user.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="hasCompanions"
+                        type="checkbox"
+                        checked={formData.hasCompanions}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            hasCompanions: e.target.checked,
+                            companions: e.target.checked ? prev.companions : 0,
+                          }));
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <label
+                        htmlFor="hasCompanions"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        동반인원이 있으신가요?(본인을 제외한 인원이 있을 경우)
+                      </label>
+                    </div>
+
+                    {formData.hasCompanions && (
+                      <div className="flex flex-col gap-1 ml-6">
+                        <label
+                          htmlFor="companions"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          동반 인원 수(본인을 제외한 인원 수를 입력해주세요)
+                        </label>
+                        <input
+                          id="companions"
+                          type="number"
+                          min="1"
+                          placeholder="1"
+                          value={formData.companions}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              companions: parseInt(e.target.value) || 0,
+                            }))
+                          }
+                          className="p-2 border rounded"
+                          required
+                        />
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {!isConfirmationVisible && (
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  ref={submitButtonRef}
+                  className="p-3 bg-black text-white rounded disabled:bg-gray-400 mt-2"
+                >
+                  {isSubmitting ? "제출 중..." : "신청하기"}
+                </button>
+              )}
             </form>
+            <button
+              className="text-center w-full text-gray-400 text-xs underline my-4"
+              onClick={() => setIsConfirmationVisible(!isConfirmationVisible)}
+            >
+              {isConfirmationVisible
+                ? "신청한 적이 없어요. 참가 신청을 할게요"
+                : "이미 신청했고, 확정 여부를 보고 싶어요"}
+            </button>
           </div>
 
           {!isFormVisible && (
