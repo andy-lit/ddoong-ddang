@@ -8,7 +8,7 @@ export const userInfo = [
   {
     name: "승은",
     session: "Vocal",
-    instagram: "froglimber",
+    instagram: "kxmsxxngxxn",
   },
   {
     name: "유경",
