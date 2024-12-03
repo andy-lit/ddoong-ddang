@@ -498,7 +498,9 @@ export default function Home() {
               전달드립니다
             </div>
             <div>
-              - 뚱땅뚱땅하게 예쁜 포스터를 만들어준 친구들께 이 영광을 바칩니다
+              - 뚱땅뚱땅하게 예쁜 포스터를 만들어준{" "}
+              <b>신정초등학교 5학년 9반 친구들</b>께 이 영광을 바칩니다.{" "}
+              <span className="line-through">5959 예뻐라 자란다 자란다</span>
             </div>
           </div>
 
