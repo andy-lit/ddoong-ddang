@@ -40,6 +40,7 @@ export default function Home() {
   const formRef = useRef<HTMLDivElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [confirmed, setConfirmed] = useState(false);
+  const [hasStoredData, setHasStoredData] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -64,6 +65,7 @@ export default function Home() {
           setFormData(registrationInfo);
           setIsConfirmationVisible(true);
           setConfirmed(registrationInfo.confirmed);
+          setHasStoredData(Boolean(registrationInfo.id));
         });
     }
   }, []);
@@ -138,8 +140,39 @@ export default function Home() {
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data[0]));
       setIsConfirmationVisible(true);
+      setHasStoredData(true);
 
       alert("신청이 완료되었습니다!");
+    } catch (error) {
+      console.error(error);
+      alert("신청 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCheckSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { hasCompanions, ...body } = formData;
+      const { data, error } = await supabase
+        .from("registrations")
+        .select("*")
+        .eq("name", formData.name)
+        .eq("phone", formData.phone);
+
+      if (error) throw error;
+      const userInfo = data?.[0];
+      if (!userInfo)
+        return window.alert("입력하신 정보로 참가신청한 내역을 찾을 수 없어요");
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userInfo));
+      // setIsConfirmationVisible(true);
+      setHasStoredData(true);
+
+      // alert("신청이 완료되었습니다!");
     } catch (error) {
       console.error(error);
       alert("신청 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -473,8 +506,13 @@ export default function Home() {
             <div className="text-lg mb-2">
               {isConfirmationVisible ? "CHECK-IN" : "REGISTRATION"}
             </div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              {isConfirmationVisible ? (
+            <form
+              onSubmit={
+                isConfirmationVisible ? handleCheckSubmit : handleSubmit
+              }
+              className="flex flex-col gap-4"
+            >
+              {isConfirmationVisible && hasStoredData ? (
                 <>
                   <div>
                     <b>{formData.name}님</b>{" "}
@@ -483,7 +521,7 @@ export default function Home() {
                       : ""}
                     참가 {confirmed ? "확정" : "신청"}이 완료 되었습니다!
                   </div>
-                  {!confirmed && (
+                  {!confirmed ? (
                     <>
                       <img src="/qr.png" alt="QR Code" className="w-full" />
                       <button
@@ -520,6 +558,12 @@ export default function Home() {
                         </div>
                       </div>
                     </>
+                  ) : (
+                    <div className="text-sm text-gray-600 gap-2">
+                      <div>
+                        - 입금이 확인되어, <b>참여 확정</b>이 되셨습니다!
+                      </div>
+                    </div>
                   )}
                 </>
               ) : (
@@ -651,7 +695,18 @@ export default function Home() {
                 </>
               )}
 
-              {!isConfirmationVisible && (
+              {isConfirmationVisible ? (
+                confirmed ? null : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    ref={submitButtonRef}
+                    className="p-3 bg-black text-white rounded disabled:bg-gray-400 mt-2"
+                  >
+                    {isSubmitting ? "제출 중..." : "신청결과 확인하기"}
+                  </button>
+                )
+              ) : (
                 <button
                   type="submit"
                   disabled={isSubmitting}
