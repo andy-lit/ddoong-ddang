@@ -438,10 +438,7 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <div className="text-sm flex flex-col items-end justify-between h-full">
                     <div className="">{music.title}</div>
-                    <div className="text-sm text-gray-600 ">{music.artist}</div>
-                    <div className="text-xs text-gray-400">
-                      {music.sessions.join(", ")}
-                    </div>
+                    <div className="text-sm text-gray-400 ">{music.artist}</div>
                   </div>
                 </div>
               </div>
