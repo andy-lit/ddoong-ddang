@@ -135,7 +135,7 @@ export default function Home() {
       const { hasCompanions, ...body } = formData;
       const { data, error } = await supabase
         .from("registrations")
-        .insert([body])
+        .insert([{ ...body, companions: hasCompanions ? body.companions : 0 }])
         .select("*");
 
       if (error) throw error;
