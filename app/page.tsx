@@ -44,10 +44,12 @@ export default function Home() {
 
   const [formData, setFormData] = useState({
     name: "",
-    phone: "010",
+    phone: "",
     referrer: "",
     companions: 1,
     hasCompanions: false,
+    // 뒷풀이 참석여부
+    joinParty: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -583,7 +585,7 @@ export default function Home() {
                     <input
                       id="name"
                       type="text"
-                      placeholder="이름을 입력해주세요"
+                      placeholder="정확한 이름을 입력해주세요"
                       value={formData.name}
                       onChange={(e) =>
                         setFormData((prev) => ({
@@ -609,6 +611,14 @@ export default function Home() {
                       placeholder="010-0000-0000"
                       value={formData.phone}
                       onChange={handlePhoneChange}
+                      onFocus={() => {
+                        if (formData.phone === "") {
+                          setFormData((prev) => ({
+                            ...prev,
+                            phone: "010",
+                          }));
+                        }
+                      }}
                       className="p-2 border rounded"
                       required
                       maxLength={13}
@@ -647,6 +657,29 @@ export default function Home() {
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="joinParty"
+                        type="checkbox"
+                        checked={formData.joinParty}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            joinParty: e.target.checked,
+                          }));
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <label
+                        htmlFor="joinParty"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        뒤풀이에 참석하시겠어요?
+                      </label>
+                    </div>
                   </div>
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
