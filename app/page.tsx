@@ -173,6 +173,7 @@ export default function Home() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(userInfo));
       // setIsConfirmationVisible(true);
       setHasStoredData(true);
+      setConfirmed(userInfo.confirmed);
 
       // alert("신청이 완료되었습니다!");
     } catch (error) {
