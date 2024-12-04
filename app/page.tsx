@@ -46,7 +46,7 @@ export default function Home() {
     name: "",
     phone: "",
     referrer: "",
-    companions: 1,
+    companions: 0,
     hasCompanions: false,
     // 뒷풀이 참석여부
     joinParty: false,
