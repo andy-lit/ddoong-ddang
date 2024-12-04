@@ -396,6 +396,12 @@ export default function Home() {
                 key={music.title + idx}
                 className="flex items-center w-full justify-between gap-4 mb-2"
               >
+                <div className="flex items-center gap-2">
+                  <div className="text-sm flex flex-col items-start justify-between h-full">
+                    <div className="">{music.title}</div>
+                    <div className="text-sm text-gray-400 ">{music.artist}</div>
+                  </div>
+                </div>
                 <div className="relative">
                   <img
                     src={music.imageUrl}
@@ -434,12 +440,6 @@ export default function Home() {
                     className="hidden"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   />
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-sm flex flex-col items-end justify-between h-full">
-                    <div className="">{music.title}</div>
-                    <div className="text-sm text-gray-400 ">{music.artist}</div>
-                  </div>
                 </div>
               </div>
             ))}
