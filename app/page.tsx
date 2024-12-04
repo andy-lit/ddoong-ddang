@@ -133,6 +133,25 @@ export default function Home() {
 
     try {
       const { hasCompanions, ...body } = formData;
+      const { data: storedData, error: storedError } = await supabase
+        .from("registrations")
+        .select("*")
+        .eq("phone", formData.phone)
+        .eq("name", formData.name);
+      const usersStoredData = storedData?.[0];
+      if (usersStoredData) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(usersStoredData));
+        setHasStoredData(true);
+        setIsConfirmationVisible(true);
+        setConfirmed(usersStoredData.confirmed);
+        window.alert(
+          usersStoredData.confirmed
+            ? `입금 확인되어, 참가 확정되었습니다.`
+            : `참가 신청이 완료되었습니다!`
+        );
+        return;
+      }
+
       const { data, error } = await supabase
         .from("registrations")
         .insert([{ ...body, companions: hasCompanions ? body.companions : 0 }])
