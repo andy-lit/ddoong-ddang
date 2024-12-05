@@ -73,35 +73,35 @@ export default function AdminPage() {
   );
   const totalCount = filteredRegistrations.length + totalCompanions;
 
-  const handleSendSMS = async (registration: Registration) => {
-    try {
-      const paymentUrl = `https://ddoong-ddang.vercel.app?id=${registration.id}`;
+  //   const handleSendSMS = async (registration: Registration) => {
+  //     try {
+  //       const paymentUrl = `https://ddoong-ddang.vercel.app?id=${registration.id}`;
 
-      const message = `[뚱땅뚱땅 밴드 참여 확정 안내]안녕하세요 ${registration.name}님, 뚱땅뚱땅 밴드 공연 입금이 확인되었습니다. ${paymentUrl}`;
+  //       const message = `[뚱땅뚱땅 밴드 참여 확정 안내]안녕하세요 ${registration.name}님, 뚱땅뚱땅 밴드 공연 입금이 확인되었습니다. ${paymentUrl}`;
 
-      const response = await fetch("/api/sms", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: registration.phone,
-          content: message,
-        }),
-      });
+  //       const response = await fetch("/api/sms", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           to: registration.phone,
+  //           content: message,
+  //         }),
+  //       });
 
-      const data = await response.json();
+  //       const data = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.error);
-      }
+  //       if (!data.success) {
+  //         throw new Error(data.error);
+  //       }
 
-      alert("문자메시지가 발송되었습니다.");
-    } catch (error) {
-      console.error("문자 발송 실패:", error);
-      alert("문자 발송에 실패했습니다.");
-    }
-  };
+  //       alert("문자메시지가 발송되었습니다.");
+  //     } catch (error) {
+  //       console.error("문자 발송 실패:", error);
+  //       alert("문자 발송에 실패했습니다.");
+  //     }
+  //   };
 
   if (isLoading) {
     return <div className="container mx-auto p-4">로딩중...</div>;
