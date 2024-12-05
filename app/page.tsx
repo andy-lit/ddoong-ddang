@@ -584,7 +584,16 @@ export default function Home() {
                       </button>
                       <div className="text-sm text-gray-600 gap-2">
                         <div>
-                          - 참여 확정을 위해 5,000원을 입금 부탁드립니다.{" "}
+                          - 참여 확정을 위해{" "}
+                          <b>
+                            {(formData.hasCompanions
+                              ? 5000 * (formData.companions + 1)
+                              : 5000
+                            ).toLocaleString()}
+                            원
+                          </b>
+                          을 입금 부탁드립니다.{" "}
+                          <b>입금 과정에서 금액을 수정할 수 있어요!</b>
                           <span className="line-through">
                             후원의 의미로 더 주신다면, 그건 정말 감사합니다
                           </span>
