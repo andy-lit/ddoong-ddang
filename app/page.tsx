@@ -805,16 +805,16 @@ export default function Home() {
             </button>
           </div>
 
-          {!isFormVisible && (
+          {/* {!isFormVisible && (
             <button
               onClick={() =>
                 formRef.current?.scrollIntoView({ behavior: "smooth" })
               }
-              className="sticky -bottom-4 w-full sm:py-6 py-4 bg-black text-white sm:rounded-b-[25px]"
+              className="sticky bottom-0 left-0  w-full sm:w-[390px] sm:py-6 py-4 bg-black text-white sm:rounded-b-[55px]"
             >
               참가 신청하기
             </button>
-          )}
+          )} */}
 
           <div className="flex flex-col justify-center align-items font-light text-center text-xs py-4 ">
             <div>Copyright © 2024 DDOONG DDANG BAND.</div>
