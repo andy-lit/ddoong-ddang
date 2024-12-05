@@ -586,6 +586,11 @@ export default function Home() {
                         <div>
                           - 참여 확정을 위해{" "}
                           <b>
+                            {formData.hasCompanions && (
+                              <span>
+                                총 {formData.companions + 1}명의 입장료
+                              </span>
+                            )}
                             {(formData.hasCompanions
                               ? 5000 * (formData.companions + 1)
                               : 5000
