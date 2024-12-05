@@ -10,7 +10,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { userInfo } from "./userInfo";
 import { musicInfo } from "./music-info";
 import { useState, useRef, useEffect } from "react";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/app/utils/supabase";
 
 // music.youtubeUrl이 전체 URL인 경우 (예: https://youtube.com/watch?v=abcd1234)
 // ID만 추출하는 함수를 만듭니다
@@ -55,20 +55,43 @@ export default function Home() {
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   useEffect(() => {
+    // URL에서 id 파라미터 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlId = urlParams.get("id");
+
+    // localStorage 확인
     const storedInfo = localStorage.getItem(STORAGE_KEY);
-    if (storedInfo) {
-      supabase
-        .from("registrations")
-        .select("*")
-        .eq("id", JSON.parse(storedInfo).id)
-        .then(({ data }) => {
-          const registrationInfo = data?.[0];
-          if (!registrationInfo) return;
-          setFormData(registrationInfo);
-          setIsConfirmationVisible(true);
-          setConfirmed(registrationInfo.confirmed);
-          setHasStoredData(Boolean(registrationInfo.id));
-        });
+
+    // URL의 id나 localStorage 중 하나라도 있으면 데이터 조회
+    if (urlId || storedInfo) {
+      const id = urlId || (storedInfo ? JSON.parse(storedInfo).id : null);
+
+      if (id) {
+        supabase
+          .from("registrations")
+          .select("*")
+          .eq("id", id)
+          .then(({ data }) => {
+            const registrationInfo = data?.[0];
+            if (!registrationInfo) return;
+
+            // localStorage에 저장
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(registrationInfo));
+
+            setFormData(registrationInfo);
+            setIsConfirmationVisible(true);
+            setConfirmed(registrationInfo.confirmed);
+            setHasStoredData(Boolean(registrationInfo.id));
+
+            if (registrationInfo.confirmed) {
+              // scorll down to end
+              window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth",
+              });
+            }
+          });
+      }
     }
   }, []);
 
@@ -541,7 +564,7 @@ export default function Home() {
                   <div>
                     <b>{formData.name}님</b>{" "}
                     {formData.companions > 0
-                      ? `외 ${formData.companions}명 님의`
+                      ? `외 ${formData.companions}명의 `
                       : ""}
                     참가 {confirmed ? "확정" : "신청"}이 완료 되었습니다!
                   </div>
