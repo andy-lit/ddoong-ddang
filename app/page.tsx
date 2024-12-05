@@ -78,7 +78,10 @@ export default function Home() {
             // localStorage에 저장
             localStorage.setItem(STORAGE_KEY, JSON.stringify(registrationInfo));
 
-            setFormData(registrationInfo);
+            setFormData({
+              ...registrationInfo,
+              hasCompanions: registrationInfo.companions > 0,
+            });
             setIsConfirmationVisible(true);
             setConfirmed(registrationInfo.confirmed);
             setHasStoredData(Boolean(registrationInfo.id));
@@ -585,12 +588,12 @@ export default function Home() {
                       <div className="text-sm text-gray-600 gap-2">
                         <div>
                           - 참여 확정을 위해{" "}
+                          {formData.hasCompanions && (
+                            <span>
+                              총 {formData.companions + 1}명의 입장료{" "}
+                            </span>
+                          )}
                           <b>
-                            {formData.hasCompanions && (
-                              <span>
-                                총 {formData.companions + 1}명의 입장료
-                              </span>
-                            )}
                             {(formData.hasCompanions
                               ? 5000 * (formData.companions + 1)
                               : 5000
@@ -598,7 +601,7 @@ export default function Home() {
                             원
                           </b>
                           을 입금 부탁드립니다.{" "}
-                          <b>입금 과정에서 금액을 수정할 수 있어요!</b>
+                          <b>입금 과정에서 금액을 수정할 수 있어요! </b>
                           <span className="line-through">
                             후원의 의미로 더 주신다면, 그건 정말 감사합니다
                           </span>
