@@ -191,14 +191,14 @@ export default function AdminPage() {
                     >
                       {registration.confirmed ? "✅" : "❌"}
                     </button>
-                    {!registration.confirmed && (
+                    {/* {!registration.confirmed && (
                       <button
                         onClick={() => handleSendSMS(registration)}
                         className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600"
                       >
                         문자발송
                       </button>
-                    )}
+                    )} */}
                   </div>
                 </td>
               </tr>
