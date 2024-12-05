@@ -270,7 +270,7 @@ export default function Home() {
               pauseOnMouseEnter: true,
               stopOnLastSlide: true,
             }}
-            className="w-[100vw] h-[70vh] sm:w-[390px] sm:h-[60vh] z-2"
+            className="w-[100vw] h-[70vh] sm:w-[390px] sm:h-[70%] z-2"
           >
             {[1, 2, 3, 4, 5, 6, 7, 1].map((item, idx) => (
               <SwiperSlide key={item + idx}>
@@ -810,7 +810,7 @@ export default function Home() {
               onClick={() =>
                 formRef.current?.scrollIntoView({ behavior: "smooth" })
               }
-              className="fixed bottom-0 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[390px] sm:py-6 py-4 bg-black text-white sm:rounded-b-[55px]"
+              className="sticky -bottom-4 w-full sm:py-6 py-4 bg-black text-white sm:rounded-b-[25px]"
             >
               참가 신청하기
             </button>
