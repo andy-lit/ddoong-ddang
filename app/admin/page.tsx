@@ -18,10 +18,11 @@ interface Registration {
 export default function AdminPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedReferrer, setSelectedReferrer] = useState<string>("");
+  const [selectedReferrers, setSelectedReferrers] = useState<string[]>([]);
   const [filters, setFilters] = useState({
     confirmed: false,
     joinParty: false,
+    unconfirmed: false,
   });
 
   useEffect(() => {
@@ -61,8 +62,15 @@ export default function AdminPage() {
   };
 
   const filteredRegistrations = registrations.filter((reg) => {
-    if (selectedReferrer && reg.referrer !== selectedReferrer) return false;
+    if (selectedReferrers.length === 0) return false;
+    if (selectedReferrers.length === userInfo.length) return true;
+    if (
+      selectedReferrers.length > 0 &&
+      !selectedReferrers.includes(reg.referrer)
+    )
+      return false;
     if (filters.confirmed && !reg.confirmed) return false;
+    if (filters.unconfirmed && reg.confirmed) return false;
     if (filters.joinParty && !reg.joinParty) return false;
     return true;
   });
@@ -103,6 +111,26 @@ export default function AdminPage() {
   //     }
   //   };
 
+  const handleReferrerClick = (referrer: string) => {
+    if (referrer === "전체") {
+      // 전체가 선택된 경우, 모든 선택을 해제
+      if (selectedReferrers.length === userInfo.length) {
+        setSelectedReferrers([]);
+      }
+      // 일부만 선택되었거나 아무것도 선택되지 않은 경우, 모두 선택
+      else {
+        setSelectedReferrers(userInfo.map((user) => user.name));
+      }
+    } else {
+      // 개별 지인 선택/해제
+      setSelectedReferrers((prev) =>
+        prev.includes(referrer)
+          ? prev.filter((r) => r !== referrer)
+          : [...prev, referrer]
+      );
+    }
+  };
+
   if (isLoading) {
     return <div className="container mx-auto p-4">로딩중...</div>;
   }
@@ -111,29 +139,63 @@ export default function AdminPage() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">등록 현황</h1>
 
-      <div className="mb-4 flex flex-wrap gap-4">
-        <select
-          value={selectedReferrer}
-          onChange={(e) => setSelectedReferrer(e.target.value)}
-          className="p-2 border rounded"
+      <div className="mb-4 flex flex-wrap gap-2">
+        <button
+          onClick={() => handleReferrerClick("전체")}
+          className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors
+            ${
+              selectedReferrers.length === userInfo.length
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
         >
-          <option value="">모든 지인</option>
-          {userInfo.map((user) => (
-            <option key={user.name} value={user.name}>
-              {user.name}의 지인
-            </option>
-          ))}
-        </select>
+          전체
+        </button>
+        {userInfo.map((user) => (
+          <button
+            key={user.name}
+            onClick={() => handleReferrerClick(user.name)}
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors
+              ${
+                selectedReferrers.includes(user.name)
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+          >
+            {user.name}
+          </button>
+        ))}
+      </div>
 
+      <div className="mb-4 flex flex-wrap gap-4">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={filters.confirmed}
             onChange={(e) =>
-              setFilters((prev) => ({ ...prev, confirmed: e.target.checked }))
+              setFilters((prev) => ({
+                ...prev,
+                confirmed: e.target.checked,
+                unconfirmed: false,
+              }))
             }
           />
           입금 확인된 사람만 보기
+        </label>
+
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={filters.unconfirmed}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                unconfirmed: e.target.checked,
+                confirmed: false,
+              }))
+            }
+          />
+          입금 미확인된 사람만 보기
         </label>
 
         <label className="flex items-center gap-2">
