@@ -235,7 +235,7 @@ function AdminContent() {
           </thead>
           <tbody className="text-xs">
             {filteredRegistrations.map((registration: Registration) => (
-              <tr key={registration.id}>
+              <tr key={registration.id} className="h-16">
                 <td className="px-2 py-1 border">{registration.name}</td>
                 <td className="px-2 py-1 border">{registration.phone}</td>
                 <td className="px-2 py-1 border">{registration.referrer}</td>
