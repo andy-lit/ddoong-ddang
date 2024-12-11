@@ -3,6 +3,7 @@
 import { supabase } from "@/app/utils/supabase";
 import { useEffect, useState } from "react";
 import { userInfo } from "../userInfo";
+import { useSearchParams } from "next/navigation";
 
 interface Registration {
   id: string;
@@ -22,6 +23,8 @@ export default function AdminPage() {
   const [selectedReferrers, setSelectedReferrers] = useState<string[]>(
     userInfo.map(({ name }) => name)
   );
+  const searchParams = useSearchParams();
+  const isAdmin = searchParams.get("admin") === "true";
   const [filters, setFilters] = useState({
     confirmed: false,
     joinParty: false,
@@ -67,6 +70,7 @@ export default function AdminPage() {
   };
 
   const toggleArrival = async (id: string, currentStatus: boolean) => {
+    if (!isAdmin) return;
     try {
       const { error } = await supabase
         .from("registrations")
@@ -253,7 +257,7 @@ export default function AdminPage() {
               <th className="px-2 py-1 border">동반</th>
               <th className="px-2 py-1 border">뒤풀이</th>
               <th className="px-2 py-1 border">도착</th>
-              <th className="px-2 py-1 border">업데이트</th>
+              {isAdmin && <th className="px-2 py-1 border">업데이트</th>}
             </tr>
           </thead>
           <tbody className="text-xs">
@@ -281,20 +285,22 @@ export default function AdminPage() {
                     {registration.arrived ? "✅" : "❌"}
                   </button>
                 </td>
-                <td
-                  className={`px-2 py-1 border text-center ${
-                    registration.arrived ? "bg-red-500" : "bg-blue-500"
-                  }`}
-                >
-                  <button
-                    onClick={() =>
-                      toggleArrival(registration.id, registration.arrived)
-                    }
-                    className="hover:opacity-70"
+                {isAdmin && (
+                  <td
+                    className={`px-2 py-1 border text-center ${
+                      registration.arrived ? "bg-red-500" : "bg-blue-500"
+                    }`}
                   >
-                    {registration.arrived ? "잘못누름" : "도착 처리"}
-                  </button>
-                </td>
+                    <button
+                      onClick={() =>
+                        toggleArrival(registration.id, registration.arrived)
+                      }
+                      className="hover:opacity-70"
+                    >
+                      {registration.arrived ? "잘못누름" : "도착 처리"}
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
