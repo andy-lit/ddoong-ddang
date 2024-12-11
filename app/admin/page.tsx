@@ -26,9 +26,7 @@ export default function AdminPage() {
   const searchParams = useSearchParams();
   const isAdmin = searchParams.get("admin") === "true";
   const [filters, setFilters] = useState({
-    confirmed: false,
     joinParty: false,
-    unconfirmed: false,
     arrived: false,
     notArrived: false,
   });
@@ -91,8 +89,6 @@ export default function AdminPage() {
 
   const filteredRegistrations = registrations
     .filter((reg) => {
-      if (filters.confirmed && !reg.confirmed) return false;
-      if (filters.unconfirmed && reg.confirmed) return false;
       if (filters.joinParty && !reg.joinParty) return false;
       if (filters.arrived && !reg.arrived) return false; // 도착한 사람만 보기
       if (filters.notArrived && reg.arrived) return false; // 도착하지 않은 사람만 보기
@@ -169,36 +165,6 @@ export default function AdminPage() {
       </div>
 
       <div className="mb-3 flex flex-col gap-2 text-sm">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={filters.confirmed}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                confirmed: e.target.checked,
-                unconfirmed: false,
-              }))
-            }
-          />
-          입금 확인
-        </label>
-
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={filters.unconfirmed}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                unconfirmed: e.target.checked,
-                confirmed: false,
-              }))
-            }
-          />
-          입금 미확인
-        </label>
-
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
