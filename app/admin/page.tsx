@@ -18,7 +18,9 @@ interface Registration {
 export default function AdminPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedReferrers, setSelectedReferrers] = useState<string[]>([]);
+  const [selectedReferrers, setSelectedReferrers] = useState<string[]>(
+    userInfo.map(({ name }) => name)
+  );
   const [filters, setFilters] = useState({
     confirmed: false,
     joinParty: false,
@@ -61,19 +63,24 @@ export default function AdminPage() {
     }
   };
 
-  const filteredRegistrations = registrations.filter((reg) => {
-    if (selectedReferrers.length === 0) return false;
-    if (selectedReferrers.length === userInfo.length) return true;
-    if (
-      selectedReferrers.length > 0 &&
-      !selectedReferrers.includes(reg.referrer)
-    )
-      return false;
-    if (filters.confirmed && !reg.confirmed) return false;
-    if (filters.unconfirmed && reg.confirmed) return false;
-    if (filters.joinParty && !reg.joinParty) return false;
-    return true;
-  });
+  const filteredRegistrations = registrations
+    .filter((reg) => {
+      if (filters.confirmed && !reg.confirmed) return false;
+      if (filters.unconfirmed && reg.confirmed) return false;
+      if (filters.joinParty && !reg.joinParty) return false;
+      return true;
+    })
+    .filter((reg) => {
+      if (selectedReferrers.length === 0) return false;
+      if (selectedReferrers.length === userInfo.length) return true;
+      if (
+        selectedReferrers.length > 0 &&
+        !selectedReferrers.includes(reg.referrer)
+      )
+        return false;
+      return true;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
   const totalCompanions = filteredRegistrations.reduce(
     (sum, reg) => sum + reg.companions,
@@ -107,7 +114,7 @@ export default function AdminPage() {
   //       alert("문자메시지가 발송되었습니다.");
   //     } catch (error) {
   //       console.error("문자 발송 실패:", error);
-  //       alert("문자 발송에 실패했습니다.");
+  //       alert("문자 발송에 실패했습��다.");
   //     }
   //   };
 
@@ -136,13 +143,13 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">등록 현황</h1>
+    <div className="container mx-auto p-2 max-w-full">
+      <h1 className="text-xl font-bold mb-3">등록 현황</h1>
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-3 flex flex-wrap gap-1">
         <button
           onClick={() => handleReferrerClick("전체")}
-          className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors
+          className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors
             ${
               selectedReferrers.length === userInfo.length
                 ? "bg-blue-500 text-white"
@@ -155,7 +162,7 @@ export default function AdminPage() {
           <button
             key={user.name}
             onClick={() => handleReferrerClick(user.name)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors
               ${
                 selectedReferrers.includes(user.name)
                   ? "bg-blue-500 text-white"
@@ -167,7 +174,7 @@ export default function AdminPage() {
         ))}
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-4">
+      <div className="mb-3 flex flex-col gap-2 text-sm">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -180,7 +187,7 @@ export default function AdminPage() {
               }))
             }
           />
-          입금 확인된 사람만 보기
+          입금 확인
         </label>
 
         <label className="flex items-center gap-2">
@@ -195,7 +202,7 @@ export default function AdminPage() {
               }))
             }
           />
-          입금 미확인된 사람만 보기
+          입금 미확인
         </label>
 
         <label className="flex items-center gap-2">
@@ -206,62 +213,52 @@ export default function AdminPage() {
               setFilters((prev) => ({ ...prev, joinParty: e.target.checked }))
             }
           />
-          뒤풀이 참석자만 보기
+          뒤풀이 참석
         </label>
       </div>
 
-      <div className="mb-4 text-sm">
+      <div className="mb-3 text-sm">
         <p>
-          총 인원: {totalCount}명 (동반인원 {totalCompanions}명 포함)
+          총 인원: {totalCount}명 (동반 {totalCompanions}명)
         </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300">
+      <div className="overflow-x-auto -mx-2">
+        <table className="min-w-full bg-white border-collapse">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 border">이름</th>
-              <th className="px-4 py-2 border">전화번호</th>
-              <th className="px-4 py-2 border">지인</th>
-              <th className="px-4 py-2 border">동반인원</th>
-              <th className="px-4 py-2 border">뒤풀이</th>
-              <th className="px-4 py-2 border">입금확인/문자발송</th>
+            <tr className="bg-gray-100 text-xs">
+              <th className="px-2 py-1 border">이름</th>
+              <th className="px-2 py-1 border">연락처</th>
+              <th className="px-2 py-1 border">지인</th>
+              <th className="px-2 py-1 border">동반</th>
+              <th className="px-2 py-1 border">뒤풀이</th>
+              <th className="px-2 py-1 border">입금</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="text-xs">
             {filteredRegistrations.map((registration: Registration) => (
               <tr key={registration.id}>
-                <td className="px-4 py-2 border">{registration.name}</td>
-                <td className="px-4 py-2 border">{registration.phone}</td>
-                <td className="px-4 py-2 border">{registration.referrer}</td>
-                <td className="px-4 py-2 border text-center">
+                <td className="px-2 py-1 border">{registration.name}</td>
+                <td className="px-2 py-1 border">{registration.phone}</td>
+                <td className="px-2 py-1 border">{registration.referrer}</td>
+                <td className="px-2 py-1 border text-center">
                   {registration.companions}
                 </td>
-                <td className="px-4 py-2 border text-center">
-                  {registration.joinParty ? "참석" : "불참"}
+                <td className="px-2 py-1 border text-center">
+                  {registration.joinParty ? "O" : "X"}
                 </td>
-                <td className="px-4 py-2 border text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      onClick={() =>
-                        toggleConfirmation(
-                          registration.id,
-                          registration.confirmed
-                        )
-                      }
-                      className="hover:opacity-70"
-                    >
-                      {registration.confirmed ? "✅" : "❌"}
-                    </button>
-                    {/* {!registration.confirmed && (
-                      <button
-                        onClick={() => handleSendSMS(registration)}
-                        className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600"
-                      >
-                        문자발송
-                      </button>
-                    )} */}
-                  </div>
+                <td className="px-2 py-1 border text-center">
+                  <button
+                    onClick={() =>
+                      toggleConfirmation(
+                        registration.id,
+                        registration.confirmed
+                      )
+                    }
+                    className="hover:opacity-70"
+                  >
+                    {registration.confirmed ? "✅" : "❌"}
+                  </button>
                 </td>
               </tr>
             ))}
