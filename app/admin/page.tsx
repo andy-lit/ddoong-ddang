@@ -13,6 +13,7 @@ interface Registration {
   confirmed: boolean;
   createdAt: string;
   joinParty: boolean;
+  arrived: boolean;
 }
 
 export default function AdminPage() {
@@ -25,6 +26,8 @@ export default function AdminPage() {
     confirmed: false,
     joinParty: false,
     unconfirmed: false,
+    arrived: false,
+    notArrived: false,
   });
 
   useEffect(() => {
@@ -63,11 +66,32 @@ export default function AdminPage() {
     }
   };
 
+  const toggleArrival = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("registrations")
+        .update({ arrived: !currentStatus })
+        .eq("id", id);
+
+      if (error) throw error;
+      setRegistrations(
+        registrations.map((reg) =>
+          reg.id === id ? { ...reg, arrived: !currentStatus } : reg
+        )
+      );
+    } catch (error) {
+      console.error("도착 여부 업데이트 실패:", error);
+      alert("도착 여부 업데이트에 실패했습니다.");
+    }
+  };
+
   const filteredRegistrations = registrations
     .filter((reg) => {
       if (filters.confirmed && !reg.confirmed) return false;
       if (filters.unconfirmed && reg.confirmed) return false;
       if (filters.joinParty && !reg.joinParty) return false;
+      if (filters.arrived && !reg.arrived) return false; // 도착한 사람만 보기
+      if (filters.notArrived && reg.arrived) return false; // 도착하지 않은 사람만 보기
       return true;
     })
     .filter((reg) => {
@@ -88,48 +112,14 @@ export default function AdminPage() {
   );
   const totalCount = filteredRegistrations.length + totalCompanions;
 
-  //   const handleSendSMS = async (registration: Registration) => {
-  //     try {
-  //       const paymentUrl = `https://ddoong-ddang.vercel.app?id=${registration.id}`;
-
-  //       const message = `[뚱땅뚱땅 밴드 참여 확정 안내]안녕하세요 ${registration.name}님, 뚱땅뚱땅 밴드 공연 입금이 확인되었습니다. ${paymentUrl}`;
-
-  //       const response = await fetch("/api/sms", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           to: registration.phone,
-  //           content: message,
-  //         }),
-  //       });
-
-  //       const data = await response.json();
-
-  //       if (!data.success) {
-  //         throw new Error(data.error);
-  //       }
-
-  //       alert("문자메시지가 발송되었습니다.");
-  //     } catch (error) {
-  //       console.error("문자 발송 실패:", error);
-  //       alert("문자 발송에 실패했습��다.");
-  //     }
-  //   };
-
   const handleReferrerClick = (referrer: string) => {
     if (referrer === "전체") {
-      // 전체가 선택된 경우, 모든 선택을 해제
       if (selectedReferrers.length === userInfo.length) {
         setSelectedReferrers([]);
-      }
-      // 일부만 선택되었거나 아무것도 선택되지 않은 경우, 모두 선택
-      else {
+      } else {
         setSelectedReferrers(userInfo.map((user) => user.name));
       }
     } else {
-      // 개별 지인 선택/해제
       setSelectedReferrers((prev) =>
         prev.includes(referrer)
           ? prev.filter((r) => r !== referrer)
@@ -215,6 +205,36 @@ export default function AdminPage() {
           />
           뒤풀이 참석
         </label>
+
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={filters.arrived}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                arrived: e.target.checked,
+                notArrived: false,
+              }))
+            }
+          />
+          도착함
+        </label>
+
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={filters.notArrived}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                notArrived: e.target.checked,
+                arrived: false,
+              }))
+            }
+          />
+          도착하지 않음
+        </label>
       </div>
 
       <div className="mb-3 text-sm">
@@ -232,7 +252,8 @@ export default function AdminPage() {
               <th className="px-2 py-1 border">지인</th>
               <th className="px-2 py-1 border">동반</th>
               <th className="px-2 py-1 border">뒤풀이</th>
-              <th className="px-2 py-1 border">입금</th>
+              <th className="px-2 py-1 border">도착</th>
+              <th className="px-2 py-1 border">업데이트</th>
             </tr>
           </thead>
           <tbody className="text-xs">
@@ -257,7 +278,21 @@ export default function AdminPage() {
                     }
                     className="hover:opacity-70"
                   >
-                    {registration.confirmed ? "✅" : "❌"}
+                    {registration.arrived ? "✅" : "❌"}
+                  </button>
+                </td>
+                <td
+                  className={`px-2 py-1 border text-center ${
+                    registration.arrived ? "bg-red-500" : "bg-blue-500"
+                  }`}
+                >
+                  <button
+                    onClick={() =>
+                      toggleArrival(registration.id, registration.arrived)
+                    }
+                    className="hover:opacity-70"
+                  >
+                    {registration.arrived ? "잘못누름" : "도착 처리"}
                   </button>
                 </td>
               </tr>
