@@ -1,7 +1,7 @@
 "use client";
 
 import { supabase } from "@/app/utils/supabase";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { userInfo } from "../userInfo";
 import { useSearchParams } from "next/navigation";
 
@@ -17,7 +17,14 @@ interface Registration {
   arrived: boolean;
 }
 
-export default function AdminPage() {
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminContent />
+    </Suspense>
+  );
+}
+function AdminContent() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedReferrers, setSelectedReferrers] = useState<string[]>(
