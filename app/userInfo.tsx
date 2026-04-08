@@ -6,16 +6,6 @@ export const userInfo = [
     instagram: "kakarou_",
   },
   {
-    name: "승은",
-    session: "Vocal",
-    instagram: "kxmsxxngxxn",
-  },
-  {
-    name: "유경",
-    session: "Guitar",
-    instagram: "k_kyung_g",
-  },
-  {
     name: "현우",
     session: "Vocal",
     instagram: "froglimber",
@@ -26,13 +16,23 @@ export const userInfo = [
     instagram: "jjuujjiinnii",
   },
   {
-    name: "진우",
+    name: "준영",
     session: "Keyboard",
-    instagram: "yeondang.p",
+    instagram: "junyuuung",
   },
   {
-    name: "바름",
+    name: "홍원",
     session: "Guitar",
-    instagram: "ba_rreum",
+    instagram: "_._0_.__1_2",
+  },
+  {
+    name: "현종",
+    session: "Guitar",
+    instagram: "hambong",
+  },
+  {
+    name: "수민",
+    session: "Vocal, Bass",
+    instagram: "suminniee__",
   },
 ];

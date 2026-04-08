@@ -1,0 +1,7 @@
+{
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/Users/andy/dev/ddoong-ddang/app/userInfo.ts\"}",
+  "error": "File does not exist. Note: your current working directory is /Users/andy/dev/ddoong-ddang. Did you mean userInfo.tsx?",
+  "timestamp": "2026-04-08T11:27:53.836Z",
+  "retry_count": 1
+}

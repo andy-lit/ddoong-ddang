@@ -1,0 +1,188 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775628193959,
+  "projectRoot": "/Users/andy/dev/ddoong-ddang",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "15.0.3",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.0.0-rc-66855b96-20241106",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.0.0-rc-66855b96-20241106",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev -p 3003",
+      "build": "next build",
+      "start": "next start",
+      "lint": "next lint"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "public"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 5,
+      "lastAccessed": 1775628193934,
+      "keyFiles": [
+        "globals.css",
+        "layout.tsx",
+        "music-info.tsx",
+        "page.tsx",
+        "userInfo.tsx"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 19,
+      "lastAccessed": 1775628193936,
+      "keyFiles": [
+        "band1.png",
+        "band2.png",
+        "band3.png",
+        "band4.png",
+        "band5.png"
+      ]
+    },
+    "app/api": {
+      "path": "app/api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1775628193941,
+      "keyFiles": []
+    },
+    "app/components": {
+      "path": "app/components",
+      "purpose": "UI components",
+      "fileCount": 1,
+      "lastAccessed": 1775628193943,
+      "keyFiles": [
+        "NaverMap.tsx"
+      ]
+    },
+    "app/utils": {
+      "path": "app/utils",
+      "purpose": "Utility functions",
+      "fileCount": 1,
+      "lastAccessed": 1775628193943,
+      "keyFiles": [
+        "supabase.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "app/page.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1775647023342,
+      "type": "file"
+    },
+    {
+      "path": "app/music-info.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1775648269068,
+      "type": "file"
+    },
+    {
+      "path": "app/userInfo.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1775647702385,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 1,
+      "lastAccessed": 1775628210316,
+      "type": "file"
+    },
+    {
+      "path": "app/layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1775628215745,
+      "type": "file"
+    },
+    {
+      "path": "app/admin/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1775628216257,
+      "type": "file"
+    },
+    {
+      "path": "app/utils/supabase.ts",
+      "accessCount": 1,
+      "lastAccessed": 1775628217004,
+      "type": "file"
+    },
+    {
+      "path": "app/api/sms/route.ts",
+      "accessCount": 1,
+      "lastAccessed": 1775628217142,
+      "type": "file"
+    },
+    {
+      "path": "app/components/NaverMap.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1775628217650,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/202504080001_create_registrations_v2.sql",
+      "accessCount": 1,
+      "lastAccessed": 1775647578230,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

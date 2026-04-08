@@ -1,77 +1,101 @@
 /* eslint-disable @next/next/no-img-element */
 export const musicInfo = [
+  // 남자보컬 (현우)
   {
-    title: "그대에게",
-    artist: "신해철",
-    sessions: ["현우", "바름", "수진", "진우", "관중"],
-    imageUrl: "https://image.bugsm.co.kr/album/images/500/63/6390.jpg",
-    youtubeUrl: "gJqCO8E63-s",
-  },
-  {
-    title: "넌 내게 반했어",
-    artist: "노브레인",
-    sessions: ["현우", "바름", "수진", "진우", "관중"],
-    imageUrl: "https://image.bugsm.co.kr/album/images/500/80033/8003377.jpg",
-    youtubeUrl: "sb6NNrSjbkI",
-  },
-  {
-    title: "밤이깊었네",
-    artist: "크라잉넛",
-    sessions: ["현우", "유경", "바름", "수진", "진우", "관중"],
+    title: "60'S CARDIN",
+    artist: "Glen Check (글렌체크)",
+    sessions: ["현우", "수민", "관중", "준영", "홍원", "현종"],
     imageUrl:
-      "https://i.namu.wiki/i/eNuxFIXEwH876kYbLtFijKWXV0L1lPB5i0oBlpbft-n45QiNEAe8ptGZy_WRj16Vjrb4t56go84LuXh_JeSASA.webp",
-    youtubeUrl: "ct9pZdJHMrs",
+      "https://image.bugsm.co.kr/album/images/50/3224/322456.jpg?version=20250530005931",
+    youtubeUrl: "0fN71Wtgoa8",
   },
   {
-    title: "Time is running out",
+    title: "TOMBOY",
+    artist: "혁오",
+    sessions: ["현우", "수민", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/200944/20094414.jpg?version=20220928014700",
+    youtubeUrl: "w3-AKITQMi0",
+  },
+  {
+    title: "Antifreeze",
+    artist: "검정치마",
+    sessions: ["현우", "수민", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/2191/219117.jpg?version=20250107022518",
+    youtubeUrl: "PGADim6UzHE",
+  },
+  {
+    title: "Starlight",
     artist: "Muse",
-    sessions: ["현우", "유경", "수진", "진우", "관중"],
-    imageUrl: "https://image.bugsm.co.kr/album/images/500/328/32804.jpg",
-    youtubeUrl: "8eB2d_saQo4",
+    sessions: ["현우", "수민", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/80199/8019997.jpg?version=20250306124851",
+    youtubeUrl: "H3DG-Y5Cy1s",
   },
   {
-    title: "Don't look back in anger",
+    title: "서울의 달",
+    artist: "김건모",
+    sessions: ["현우", "수민", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/80091/8009147.jpg?version=20250107003654",
+    youtubeUrl: "IgvRBuSG9lY",
+  },
+  {
+    title: "Back in Time",
+    artist: "너드커넥션",
+    sessions: ["현우", "수민", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/203553/20355360.jpg?version=20250107011525",
+    youtubeUrl: "iMvXvXK0MAQ",
+  },
+  // 여자보컬 (수민) - 베이스도 수민이 직접
+  {
+    title: "0+0",
+    artist: "한로로",
+    sessions: ["수민", "현우", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/207447/20744778.jpg?version=20250804122248",
+    youtubeUrl: "AXx3pu6YQmQ",
+  },
+  {
+    title: "비밀번호 486",
+    artist: "윤하",
+    sessions: ["수민", "수진", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/80254/8025461.jpg?version=20250530012930",
+    youtubeUrl: "iEfIcJHEb70",
+  },
+  {
+    title: "예감 좋은 날",
+    artist: "럼블피쉬",
+    sessions: ["수민", "수진", "관중", "준영", "홍원", "현종", "현우"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/80003/8000364.jpg?version=20211215014333",
+    youtubeUrl: "t6ysS55G3Ro",
+  },
+  {
+    title: "Love wins all",
+    artist: "아이유",
+    sessions: ["수민", "수진", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/40955/4095501.jpg?version=20250326042636",
+    youtubeUrl: "h-XrgiZiQgw",
+  },
+  {
+    title: "Highlight",
+    artist: "터치드",
+    sessions: ["수민", "수진", "관중", "준영", "홍원", "현종"],
+    imageUrl:
+      "https://image.bugsm.co.kr/album/images/50/204870/20487029.jpg?version=20250101003135",
+    youtubeUrl: "dsZM7NmsO20",
+  },
+  {
+    title: "Champagne Supernova",
     artist: "Oasis",
-    sessions: ["현우", "유경", "수진", "진우", "관중"],
+    sessions: ["수민", "수진", "관중", "준영", "홍원", "현종"],
     imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpnVEv8QKjNQnPd7ccimdYYe0LR7uhSDfyYQ&s",
-    youtubeUrl: "X59TlszGtfM",
-  },
-  {
-    title: "잘부탁드립니다",
-    artist: "EX",
-    sessions: ["승은", "바름", "수진", "진우", "관중"],
-    imageUrl:
-      "https://image.bugsm.co.kr/album/images/200/80298/8029822.jpg?version=20210421043400.0",
-    youtubeUrl: "3IFBY1zbwCI",
-  },
-  {
-    title: "아픈건 딱 질색이니까",
-    artist: "여자아이들",
-    sessions: ["승은", "바름", "수진", "진우", "관중"],
-    imageUrl: "https://image.bugsm.co.kr/album/images/500/40953/4095394.jpg",
-    youtubeUrl: "yeYIsF46ZDc",
-  },
-  {
-    title: "yours",
-    artist: "데이먼스 이어",
-    sessions: ["승은", "바름", "수진", "진우", "관중"],
-    imageUrl: "https://image.bugsm.co.kr/album/images/500/202445/20244527.jpg",
-    youtubeUrl: "DGXPro9x0yo",
-  },
-  {
-    title: "폰서트",
-    artist: "10cm",
-    sessions: ["승은", "현우", "바름", "수진", "진우", "관중"],
-    imageUrl:
-      "https://cdnimg.melon.co.kr/cm/album/images/100/93/077/10093077_500.jpg?fcb28b71418e5c405c72ccfcaacc6fe8/melon/optimize/90",
-    youtubeUrl: "txi3VEdStJ4",
-  },
-  {
-    title: "All I Want For Christmas Is You",
-    artist: "MariahCarey",
-    sessions: ["승은", "현우", "유경", "바름", "수진", "진우", "관중"],
-    imageUrl: "https://image.bugsm.co.kr/album/images/500/8/829.jpg",
-    youtubeUrl: "fRyhqobl0sk",
+      "https://image.bugsm.co.kr/album/images/200/199/19993.jpg?version=20250306144103",
+    youtubeUrl: "o4tw2V2_oY8",
   },
 ];

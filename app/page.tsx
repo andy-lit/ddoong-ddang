@@ -105,7 +105,7 @@ export default function Home() {
       ([entry]) => {
         setIsFormVisible(entry.isIntersecting);
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(submitButtonRef.current);
@@ -124,7 +124,7 @@ export default function Home() {
               event: "command",
               func: "pauseVideo",
             }),
-            "*"
+            "*",
           );
         }
       });
@@ -135,7 +135,7 @@ export default function Home() {
           event: "command",
           func: isPlaying[youtubeId] ? "pauseVideo" : "playVideo",
         }),
-        "*"
+        "*",
       );
 
       // 모든 비디오의 상태를 false로 설정하고 현재 비디오만 토글
@@ -145,7 +145,7 @@ export default function Home() {
             acc[key] = false;
             return acc;
           },
-          {}
+          {},
         );
         newState[youtubeId] = !prev[youtubeId];
         return newState;
@@ -173,7 +173,7 @@ export default function Home() {
         window.alert(
           usersStoredData.confirmed
             ? `입금 확인되어, 참가 확정되었습니다.`
-            : `참가 신청이 완료되었습니다!`
+            : `참가 신청이 완료되었습니다!`,
         );
         return;
       }
@@ -241,7 +241,7 @@ export default function Home() {
     } else {
       return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(
         7,
-        11
+        11,
       )}`;
     }
   };
@@ -275,11 +275,11 @@ export default function Home() {
             }}
             className="w-[100vw] h-[70vh] sm:w-[390px] sm:h-[70%] z-2"
           >
-            {[1, 2, 3, 4, 5, 6, 7, 1].map((item, idx) => (
+            {[1, 2].map((item, idx) => (
               <SwiperSlide key={item + idx}>
                 <img
                   src={`/band${item}.png`}
-                  className="h-full w-full  z-2"
+                  className="h-full w-full object-contain z-2"
                   alt={item.toString()}
                 />
               </SwiperSlide>
@@ -287,18 +287,18 @@ export default function Home() {
           </Swiper>
 
           <div className="text-2xl mt-8 mb-6 font-bold text-center">
-            뚱땅뚱땅 밴드 첫공연
+            뚱땅뚱땅 밴드 두번째 공연
           </div>
 
           <div className="mt-2 text-center flex items-center justify-between w-full px-4 text-md text-gray-600 gap-2">
-            2024년 12월 14일 오후 7시 30분
+            2025년 5월 30일(토) 오후 7시
             <a
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                const eventTitle = "뚱땅뚱땅 밴드 첫공연";
-                const eventLocation = "홍대 우주정거장";
-                const eventDate = "2024-12-14T19:30:00";
+                const eventTitle = "뚱땅뚱땅 밴드 두번째 공연";
+                const eventLocation = "강남역 스타이즈본";
+                const eventDate = "2025-05-30T19:00:00";
 
                 // iOS의 경우
                 if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
@@ -311,9 +311,9 @@ export default function Home() {
                   const startTime = new Date(eventDate).getTime();
                   const endTime = startTime + 2 * 60 * 60 * 1000; // 2시간 후
                   window.location.href = `content://com.android.calendar/time/${startTime}?title=${encodeURIComponent(
-                    eventTitle
+                    eventTitle,
                   )}&description=공연&location=${encodeURIComponent(
-                    eventLocation
+                    eventLocation,
                   )}&begin=${startTime}&end=${endTime}`;
                 }
               }}
@@ -336,17 +336,17 @@ export default function Home() {
             </a>
           </div>
           <div className="flex items-center justify-between w-full gap-2 px-4 text-md text-gray-600">
-            <span className=" mt-2 text-center ">홍대 우주정거장</span>
+            <span className=" mt-2 text-center ">강남역 스타이즈본</span>
             <div className="flex items-center rounded-sm gap-2">
               <a
-                href="nmap://search?query=홍대 우주정거장&appname=뚱땅뚱땅밴드"
+                href="nmap://search?query=스타이즈본 강남&appname=뚱땅뚱땅밴드"
                 onClick={(e) => {
                   e.preventDefault();
                   const naverMapUrl = /Android|iPhone|iPad|iPod/i.test(
-                    navigator.userAgent
+                    navigator.userAgent,
                   )
-                    ? "nmap://search?query=홍대 우주정거장&appname=뚱땅뚱땅밴드"
-                    : "https://map.naver.com/p/search/홍대%20우주정거장";
+                    ? "nmap://search?query=스타이즈본 강남&appname=뚱땅뚱땅밴드"
+                    : "https://map.naver.com/p/search/스타이즈본%20강남";
                   window.location.href = naverMapUrl;
                 }}
                 className="flex items-center gap-1 text-sm mt-1 hover:text-blue-500 cursor-pointer"
@@ -358,14 +358,14 @@ export default function Home() {
                 />
               </a>
               <a
-                href="kakaomap://search?q=홍대 우주정거장"
+                href="kakaomap://search?q=스타이즈본 강남"
                 onClick={(e) => {
                   e.preventDefault();
                   const kakaoMapUrl = /Android|iPhone|iPad|iPod/i.test(
-                    navigator.userAgent
+                    navigator.userAgent,
                   )
-                    ? "kakaomap://search?q=홍대 우주정거장"
-                    : "https://map.kakao.com/?q=홍대 우주정거장";
+                    ? "kakaomap://search?q=스타이즈본 강남"
+                    : "https://map.kakao.com/?q=스타이즈본 강남";
                   window.location.href = kakaoMapUrl;
                 }}
                 className="flex items-center gap-1 rounded-sm text-sm mt-1 hover:text-yellow-500 cursor-pointer"
@@ -407,7 +407,7 @@ export default function Home() {
                     onClick={(e) => {
                       e.preventDefault();
                       const instagramUrl = /Android|iPhone|iPad|iPod/i.test(
-                        navigator.userAgent
+                        navigator.userAgent,
                       )
                         ? `instagram://user?username=${user.instagram}`
                         : `https://instagram.com/${user.instagram}`;
@@ -501,7 +501,7 @@ export default function Home() {
                   <iframe
                     className="absolute top-0 left-0 w-full h-full"
                     src={`https://www.youtube.com/embed/${getYoutubeId(
-                      selectedVideo
+                      selectedVideo,
                     )}?autoplay=1`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -575,7 +575,7 @@ export default function Home() {
                         onClick={() => {
                           window.open(
                             "https://qr.kakaopay.com/Ej8bOmDb69c409360",
-                            "_blank"
+                            "_blank",
                           );
                         }}
                       >
