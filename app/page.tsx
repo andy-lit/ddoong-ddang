@@ -73,7 +73,7 @@ export default function Home() {
   const [playerState, setPlayerState] = useState<PlayerState>("paused");
 
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
-  const playerRef = useRef<HTMLIFrameElement>(null);
+  const playerRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
   const formRef = useRef<HTMLDivElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -178,7 +178,7 @@ export default function Home() {
 
   const getYoutubeEmbedSrc = (youtubeUrl: string) => {
     const params = new URLSearchParams({
-      autoplay: "1",
+      autoplay: "0",
       enablejsapi: "1",
       playsinline: "1",
       rel: "0",
@@ -191,8 +191,11 @@ export default function Home() {
     return `https://www.youtube.com/embed/${getYoutubeId(youtubeUrl)}?${params.toString()}`;
   };
 
-  const sendPlayerCommand = (func: "playVideo" | "pauseVideo") => {
-    playerRef.current?.contentWindow?.postMessage(
+  const sendPlayerCommand = (
+    youtubeId: string,
+    func: "playVideo" | "pauseVideo",
+  ) => {
+    playerRefs.current[youtubeId]?.contentWindow?.postMessage(
       JSON.stringify({
         event: "command",
         func,
@@ -202,12 +205,14 @@ export default function Home() {
     );
   };
 
-  const requestInitialPlay = () => {
-    // 모바일 Safari/Chrome에서는 iframe src의 autoplay=1만으로 첫 재생이 막히는 경우가 있어
-    // iframe이 실제로 붙은 뒤 YouTube iframe API의 playVideo 명령을 다시 보낸다.
-    [0, 150, 500, 1000].forEach((delay) => {
+  const requestPlay = (youtubeId: string) => {
+    // 모바일에서는 iframe을 클릭 이벤트 안에서 새로 만들면 로드가 제스처보다 늦어져
+    // 첫 playVideo가 막힐 수 있다. 그래서 iframe들은 미리 마운트해두고,
+    // 사용자의 재생 버튼 클릭 이벤트 안에서 즉시 playVideo를 보낸다.
+    sendPlayerCommand(youtubeId, "playVideo");
+    [120, 350, 800].forEach((delay) => {
       window.setTimeout(() => {
-        sendPlayerCommand("playVideo");
+        sendPlayerCommand(youtubeId, "playVideo");
       }, delay);
     });
   };
@@ -218,20 +223,28 @@ export default function Home() {
 
     if (activeYoutubeId === youtubeId) {
       if (playerState === "playing" || playerState === "loading") {
-        sendPlayerCommand("pauseVideo");
+        sendPlayerCommand(youtubeId, "pauseVideo");
         setPlayerState("paused");
       } else {
-        sendPlayerCommand("playVideo");
+        requestPlay(youtubeId);
         setPlayerState("playing");
       }
       return;
     }
 
+    if (activeYoutubeId) {
+      sendPlayerCommand(activeYoutubeId, "pauseVideo");
+    }
+
+    requestPlay(youtubeId);
     setActiveMusic(music);
-    setPlayerState("loading");
+    setPlayerState("playing");
   };
 
   const closePlayer = () => {
+    if (activeMusic) {
+      sendPlayerCommand(getYoutubeId(activeMusic.youtubeUrl), "pauseVideo");
+    }
     setActiveMusic(null);
     setPlayerState("paused");
   };
@@ -339,54 +352,67 @@ export default function Home() {
     }
   };
 
+  const activeYoutubeId = activeMusic ? getYoutubeId(activeMusic.youtubeUrl) : null;
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center relative">
-      {activeMusic && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-24px)] max-w-[390px] rounded-2xl border border-gray-200 bg-white/95 shadow-lg backdrop-blur px-3 py-2">
-          <div className="flex items-center gap-3">
-            <div className="relative h-[54px] w-24 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
-              {playerState === "loading" && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 bg-gray-100 text-[10px] font-medium text-gray-500">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
-                  로딩중
-                </div>
-              )}
-              <iframe
-                ref={playerRef}
-                key={getYoutubeId(activeMusic.youtubeUrl)}
-                title={`${activeMusic.title} 재생 플레이어`}
-                src={getYoutubeEmbedSrc(activeMusic.youtubeUrl)}
-                className="h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                onLoad={() => {
-                  requestInitialPlay();
-                  setPlayerState("playing");
-                }}
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-400">
-                Now Playing
+      <div
+        className={`fixed top-3 left-1/2 z-50 w-[calc(100vw-24px)] max-w-[390px] -translate-x-1/2 rounded-2xl border border-gray-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur transition-opacity ${
+          activeMusic ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="relative h-[54px] w-24 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
+            {playerState === "loading" && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 bg-gray-100 text-[10px] font-medium text-gray-500">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
+                로딩중
               </div>
-              <div className="truncate text-sm font-semibold text-gray-900">
-                {activeMusic.title}
-              </div>
-              <div className="truncate text-xs text-gray-500">
-                {activeMusic.artist}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={closePlayer}
-              aria-label="재생바 닫기"
-              className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200"
-            >
-              ×
-            </button>
+            )}
+            {musicInfo.map((music) => {
+              const youtubeId = getYoutubeId(music.youtubeUrl);
+              const isActive = activeYoutubeId === youtubeId;
+
+              return (
+                <iframe
+                  ref={(node) => {
+                    playerRefs.current[youtubeId] = node;
+                  }}
+                  key={youtubeId}
+                  title={`${music.title} 재생 플레이어`}
+                  src={getYoutubeEmbedSrc(music.youtubeUrl)}
+                  className={
+                    isActive
+                      ? "h-full w-full"
+                      : "pointer-events-none fixed -left-[9999px] top-0 h-[54px] w-24 opacity-0"
+                  }
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              );
+            })}
           </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-400">
+              Now Playing
+            </div>
+            <div className="truncate text-sm font-semibold text-gray-900">
+              {activeMusic?.title}
+            </div>
+            <div className="truncate text-xs text-gray-500">
+              {activeMusic?.artist}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={closePlayer}
+            aria-label="재생바 닫기"
+            className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200"
+          >
+            ×
+          </button>
         </div>
-      )}
+      </div>
       <div className="flex justify-center items-center min-h-screen bg-white">
         <div
           className="relative bg-white max-w-[390px] w-full"
@@ -584,6 +610,11 @@ export default function Home() {
                       className="w-[72px] h-[72px] rounded-xl object-cover"
                     />
                     <button
+                      onPointerDown={() => {
+                        if (!isPlaying) {
+                          requestPlay(getYoutubeId(music.youtubeUrl));
+                        }
+                      }}
                       onClick={() => handleMusicClick(music)}
                       aria-label={isPlaying ? "일시정지" : "재생"}
                       className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl hover:bg-black/50 transition-all"
