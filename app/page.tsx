@@ -366,7 +366,10 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center relative">
-      <div aria-hidden className="pointer-events-none fixed -left-[9999px] top-0 h-[54px] w-24 opacity-0">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed left-0 top-0 z-0 h-[54px] w-24 overflow-hidden opacity-0"
+      >
         {musicInfo.map((music) => {
           const youtubeId = getYoutubeId(music.youtubeUrl);
 
@@ -378,7 +381,8 @@ export default function Home() {
               key={youtubeId}
               title={`${music.title} 재생 플레이어`}
               src={getYoutubeEmbedSrc(music.youtubeUrl)}
-              className="h-[54px] w-24"
+              className="absolute inset-0 h-[54px] w-24"
+              loading="eager"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
@@ -764,45 +768,62 @@ export default function Home() {
                               className="w-48 h-48"
                             />
                             <div className="w-full rounded-2xl bg-gray-50 border border-gray-100 p-4">
-                              <div className="mb-1 text-[11px] font-medium text-gray-400">송금 정보</div>
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="min-w-0 flex-1 truncate text-sm font-semibold text-gray-900">
-                                  {TRANSFER_BANK_NAME} · {TRANSFER_ACCOUNT_NO} · {transferAmount.toLocaleString()}원
-                                </div>
+                              <div className="mb-3 flex items-center justify-between gap-3">
+                                <div className="text-[11px] font-medium text-gray-400">송금 정보</div>
                                 <button
                                   type="button"
                                   aria-label="계좌번호 복사하기"
-                                  className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
+                                  className="inline-flex h-8 flex-shrink-0 items-center gap-1.5 rounded-full bg-white px-3 text-xs font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
                                   onClick={() => copyTransferInfo("계좌번호", TRANSFER_ACCOUNT_NO)}
                                 >
                                   {copiedTransferField === "계좌번호" ? (
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth={1.8}
-                                      stroke="currentColor"
-                                      className="h-4 w-4 text-green-600"
-                                    >
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                    </svg>
+                                    <>
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.8}
+                                        stroke="currentColor"
+                                        className="h-4 w-4 text-green-600"
+                                      >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                      </svg>
+                                      복사됨
+                                    </>
                                   ) : (
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth={1.5}
-                                      stroke="currentColor"
-                                      className="h-4 w-4"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
-                                      />
-                                    </svg>
+                                    <>
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="h-4 w-4"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+                                        />
+                                      </svg>
+                                      계좌 복사
+                                    </>
                                   )}
                                 </button>
+                              </div>
+                              <div className="grid gap-2 text-sm">
+                                <div className="flex items-center justify-between gap-4">
+                                  <span className="text-gray-400">은행</span>
+                                  <span className="font-semibold text-gray-900">{TRANSFER_BANK_NAME}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                  <span className="text-gray-400">계좌</span>
+                                  <span className="font-semibold text-gray-900">{TRANSFER_ACCOUNT_NO}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                  <span className="text-gray-400">금액</span>
+                                  <span className="font-semibold text-gray-900">{transferAmount.toLocaleString()}원</span>
+                                </div>
                               </div>
                             </div>
                             <button
