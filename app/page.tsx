@@ -67,10 +67,9 @@ const downloadEventIcs = () => {
 
 export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
+  const [activeYoutubeId, setActiveYoutubeId] = useState<string | null>(null);
 
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
-  const playerRefs = useRef<{ [key: string]: HTMLIFrameElement }>({});
   const formRef = useRef<HTMLDivElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -173,44 +172,29 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const togglePlay = (youtubeId: string) => {
-    const player = playerRefs.current[youtubeId];
-    if (player) {
-      // 현재 선택된 비디오의 상태를 토글하기 전에 모든 비디오를 중지
-      Object.keys(playerRefs.current).forEach((id) => {
-        if (id !== youtubeId) {
-          playerRefs.current[id].contentWindow?.postMessage(
-            JSON.stringify({
-              event: "command",
-              func: "pauseVideo",
-            }),
-            "*",
-          );
-        }
-      });
+  const createYoutubeEmbedSrc = (youtubeUrl: string, shouldAutoplay = false) => {
+    const params = new URLSearchParams({
+      enablejsapi: "1",
+      playsinline: "1",
+      rel: "0",
+    });
 
-      // 선택된 비디오 재생/중지
-      player.contentWindow?.postMessage(
-        JSON.stringify({
-          event: "command",
-          func: isPlaying[youtubeId] ? "pauseVideo" : "playVideo",
-        }),
-        "*",
-      );
-
-      // 모든 비디오의 상태를 false로 설정하고 현재 비디오만 토글
-      setIsPlaying((prev) => {
-        const newState = Object.keys(prev).reduce(
-          (acc: { [key: string]: boolean }, key) => {
-            acc[key] = false;
-            return acc;
-          },
-          {},
-        );
-        newState[youtubeId] = !prev[youtubeId];
-        return newState;
-      });
+    if (shouldAutoplay) {
+      params.set("autoplay", "1");
     }
+
+    if (typeof window !== "undefined") {
+      params.set("origin", window.location.origin);
+    }
+
+    return `https://www.youtube.com/embed/${getYoutubeId(youtubeUrl)}?${params.toString()}`;
+  };
+
+  const togglePlay = (youtubeUrl: string) => {
+    const youtubeId = getYoutubeId(youtubeUrl);
+    setActiveYoutubeId((currentId) =>
+      currentId === youtubeId ? null : youtubeId,
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -493,69 +477,75 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col px-5 items-start justify-center gap-1">
-            {musicInfo.map((music, idx) => (
-              <div
-                key={music.title + idx}
-                className="flex items-center w-full justify-between gap-3 hover:bg-gray-50 rounded-xl px-2 py-2 -mx-2 transition"
-              >
-                <div className="flex flex-col justify-center gap-0.5 min-w-0 flex-1">
-                  <div className="text-sm font-medium text-gray-900 truncate">{music.title}</div>
-                  <div className="text-xs text-gray-500 truncate">{music.artist}</div>
-                </div>
-                <div className="relative flex-shrink-0">
-                  <img
-                    src={music.imageUrl}
-                    alt={music.title}
-                    className="w-[72px] h-[72px] rounded-xl object-cover"
-                  />
-                  <button
-                    onClick={() => togglePlay(music.youtubeUrl)}
-                    aria-label={isPlaying[music.youtubeUrl] ? "일시정지" : "재생"}
-                    className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl hover:bg-black/50 transition-all"
-                  >
-                    {isPlaying[music.youtubeUrl] ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="white"
-                        className="w-7 h-7"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.75 5.25v13.5m-7.5-13.5v13.5"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="white"
-                        className="w-7 h-7"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
-                        />
-                      </svg>
+            {musicInfo.map((music, idx) => {
+              const youtubeId = getYoutubeId(music.youtubeUrl);
+              const isActive = activeYoutubeId === youtubeId;
+
+              return (
+                <div
+                  key={music.title + idx}
+                  className="flex items-center w-full justify-between gap-3 hover:bg-gray-50 rounded-xl px-2 py-2 -mx-2 transition"
+                >
+                  <div className="flex flex-col justify-center gap-0.5 min-w-0 flex-1">
+                    <div className="text-sm font-medium text-gray-900 truncate">{music.title}</div>
+                    <div className="text-xs text-gray-500 truncate">{music.artist}</div>
+                  </div>
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={music.imageUrl}
+                      alt={music.title}
+                      className="w-[72px] h-[72px] rounded-xl object-cover"
+                    />
+                    <button
+                      onClick={() => togglePlay(music.youtubeUrl)}
+                      aria-label={isActive ? "일시정지" : "재생"}
+                      className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl hover:bg-black/50 transition-all"
+                    >
+                      {isActive ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="white"
+                          className="w-7 h-7"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="white"
+                          className="w-7 h-7"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                    {isActive && (
+                      <iframe
+                        title={`${music.title} 재생 플레이어`}
+                        src={createYoutubeEmbedSrc(music.youtubeUrl, true)}
+                        className="absolute left-0 top-0 h-px w-px opacity-0 pointer-events-none"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
                     )}
-                  </button>
-                  <iframe
-                    ref={(el) => {
-                      if (el) playerRefs.current[music.youtubeUrl] = el;
-                    }}
-                    src={`https://www.youtube.com/embed/${music.youtubeUrl}?enablejsapi=1`}
-                    className="hidden"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {selectedVideo && (
@@ -567,9 +557,7 @@ export default function Home() {
                 <div className="relative pt-[56.25%] w-full h-0">
                   <iframe
                     className="absolute top-0 left-0 w-full h-full"
-                    src={`https://www.youtube.com/embed/${getYoutubeId(
-                      selectedVideo,
-                    )}?autoplay=1`}
+                    src={createYoutubeEmbedSrc(selectedVideo, true)}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
