@@ -320,14 +320,14 @@ export default function Home() {
 
           {/* Date row */}
           <div className="mt-2 flex items-center justify-between w-full px-5 text-sm text-gray-700 gap-2">
-            <span>2025년 5월 30일(토) 오후 7시</span>
+            <span>2025년 5월 30일(토) 오후 6시 30분</span>
             <a
               href="#"
               onClick={(e) => {
                 e.preventDefault();
                 const eventTitle = "뚱땅뚱땅 밴드 두번째 공연";
                 const eventLocation = "클럽 라이브앤라우드";
-                const start = new Date("2025-05-30T19:00:00+09:00");
+                const start = new Date("2025-05-30T18:30:00+09:00");
                 const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
                 const fmt = (d: Date) =>
                   d
