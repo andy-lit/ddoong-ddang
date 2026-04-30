@@ -196,9 +196,20 @@ export default function Home() {
       JSON.stringify({
         event: "command",
         func,
+        args: [],
       }),
-      "*",
+      "https://www.youtube.com",
     );
+  };
+
+  const requestInitialPlay = () => {
+    // 모바일 Safari/Chrome에서는 iframe src의 autoplay=1만으로 첫 재생이 막히는 경우가 있어
+    // iframe이 실제로 붙은 뒤 YouTube iframe API의 playVideo 명령을 다시 보낸다.
+    [0, 150, 500, 1000].forEach((delay) => {
+      window.setTimeout(() => {
+        sendPlayerCommand("playVideo");
+      }, delay);
+    });
   };
 
   const handleMusicClick = (music: MusicInfoItem) => {
@@ -348,7 +359,10 @@ export default function Home() {
                 className="h-full w-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                onLoad={() => setPlayerState("playing")}
+                onLoad={() => {
+                  requestInitialPlay();
+                  setPlayerState("playing");
+                }}
               />
             </div>
             <div className="min-w-0 flex-1">
