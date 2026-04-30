@@ -32,6 +32,39 @@ const getYoutubeId = (url: string) => {
   return match && match[2].length === 11 ? match[2] : url;
 };
 
+const downloadEventIcs = () => {
+  const eventTitle = "뚱땅뚱땅 밴드 두번째 공연";
+  const eventLocation = "클럽 라이브앤라우드";
+  const start = new Date("2025-05-30T18:30:00+09:00");
+  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+  const fmt = (d: Date) =>
+    d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//ddoong-ddang//KR",
+    "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT",
+    `UID:ddoong-ddang-2025-05-30@litcorp.xyz`,
+    `DTSTAMP:${fmt(new Date())}`,
+    `DTSTART:${fmt(start)}`,
+    `DTEND:${fmt(end)}`,
+    `SUMMARY:${eventTitle}`,
+    `LOCATION:${eventLocation}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "ddoong-ddang.ics";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
 export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({});
@@ -325,41 +358,7 @@ export default function Home() {
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                const eventTitle = "뚱땅뚱땅 밴드 두번째 공연";
-                const eventLocation = "클럽 라이브앤라우드";
-                const start = new Date("2025-05-30T18:30:00+09:00");
-                const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
-                const fmt = (d: Date) =>
-                  d
-                    .toISOString()
-                    .replace(/[-:]/g, "")
-                    .replace(/\.\d{3}/, "");
-                const ics = [
-                  "BEGIN:VCALENDAR",
-                  "VERSION:2.0",
-                  "PRODID:-//ddoong-ddang//KR",
-                  "CALSCALE:GREGORIAN",
-                  "BEGIN:VEVENT",
-                  `UID:ddoong-ddang-2025-05-30@litcorp.xyz`,
-                  `DTSTAMP:${fmt(new Date())}`,
-                  `DTSTART:${fmt(start)}`,
-                  `DTEND:${fmt(end)}`,
-                  `SUMMARY:${eventTitle}`,
-                  `LOCATION:${eventLocation}`,
-                  "END:VEVENT",
-                  "END:VCALENDAR",
-                ].join("\r\n");
-                const blob = new Blob([ics], {
-                  type: "text/calendar;charset=utf-8",
-                });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "ddoong-ddang.ics";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                downloadEventIcs();
               }}
               aria-label="캘린더에 추가"
               className="h-9 w-9 rounded-full bg-gray-100 hover:bg-gray-200 transition grid place-items-center flex-shrink-0 text-gray-600"
@@ -649,12 +648,34 @@ export default function Home() {
                               className="w-48 h-48"
                             />
                             <button
+                              type="button"
                               className="h-12 w-full rounded-xl font-medium tracking-tight bg-black text-white hover:bg-gray-800 active:scale-[0.99] transition"
                               onClick={() => {
                                 window.location.href = tossUrl;
                               }}
                             >
                               송금하기
+                            </button>
+                            <button
+                              type="button"
+                              className="h-12 w-full rounded-xl font-medium tracking-tight bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 active:scale-[0.99] transition flex items-center justify-center gap-2"
+                              onClick={downloadEventIcs}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-4 h-4"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+                                />
+                              </svg>
+                              캘린더에 추가하기
                             </button>
                           </div>
                         );
