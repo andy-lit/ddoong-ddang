@@ -491,7 +491,6 @@ export default function Home() {
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400 font-semibold">
               PLAYLIST
             </p>
-            <span className="text-xs text-gray-400 font-light">재생까지 조금 시간이 걸릴 수 있어요</span>
           </div>
           <div className="flex flex-col px-5 items-start justify-center gap-1">
             {musicInfo.map((music, idx) => (
