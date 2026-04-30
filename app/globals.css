@@ -30,4 +30,17 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* iOS Safari: input font-size < 16px일 때 포커스 시 자동 줌 방지 */
+input,
+select,
+textarea {
+  font-size: 16px;
 }
