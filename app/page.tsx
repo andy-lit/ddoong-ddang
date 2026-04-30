@@ -358,14 +358,14 @@ export default function Home() {
                 />
               </a>
               <a
-                href="kakaomap://search?q=클럽 라이브앤라우드"
+                href="kakaomap://search?q=라이브앤라우드"
                 onClick={(e) => {
                   e.preventDefault();
                   const kakaoMapUrl = /Android|iPhone|iPad|iPod/i.test(
                     navigator.userAgent,
                   )
-                    ? "kakaomap://search?q=클럽 라이브앤라우드"
-                    : "https://map.kakao.com/?q=클럽 라이브앤라우드";
+                    ? "kakaomap://search?q=라이브앤라우드"
+                    : "https://map.kakao.com/?q=라이브앤라우드";
                   window.location.href = kakaoMapUrl;
                 }}
                 className="flex items-center gap-1 rounded-sm text-sm mt-1 hover:text-yellow-500 cursor-pointer"
@@ -566,18 +566,31 @@ export default function Home() {
                   </div>
                   {!confirmed ? (
                     <>
-                      <img src="/qr.png" alt="QR Code" className="w-full" />
-                      <button
-                        className="w-full py-2 bg-black text-white"
-                        onClick={() => {
-                          window.open(
-                            "https://qr.kakaopay.com/Ej8bOmDb69c409360",
-                            "_blank",
-                          );
-                        }}
-                      >
-                        입금하기
-                      </button>
+                      {(() => {
+                        const tossUrl = `supertoss://send?amount=${
+                          10000 * (1 + formData.companions)
+                        }&bank=%ED%86%A0%EC%8A%A4%EB%B1%85%ED%81%AC&accountNo=100081506475&origin=qr`;
+                        const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=480x480&data=${encodeURIComponent(
+                          tossUrl,
+                        )}`;
+                        return (
+                          <>
+                            <img
+                              src={qrSrc}
+                              alt="QR Code"
+                              className="w-full"
+                            />
+                            <button
+                              className="w-full py-2 bg-black text-white"
+                              onClick={() => {
+                                window.location.href = tossUrl;
+                              }}
+                            >
+                              송금하기
+                            </button>
+                          </>
+                        );
+                      })()}
                       <div className="text-sm text-gray-600 gap-2">
                         <div>
                           - 참여 확정을 위해{" "}
@@ -587,20 +600,19 @@ export default function Home() {
                             </span>
                           )}
                           <b>
-                            {(formData.hasCompanions
-                              ? 5000 * (formData.companions + 1)
-                              : 5000
+                            {(
+                              10000 *
+                              (1 + formData.companions)
                             ).toLocaleString()}
                             원
                           </b>
                           을 입금 부탁드립니다.{" "}
-                          <b>입금 과정에서 금액을 수정할 수 있어요! </b>
                           <span className="line-through">
                             후원의 의미로 더 주신다면, 그건 정말 감사합니다
                           </span>
                         </div>
                         <div>
-                          - 위의 입금하기 버튼을 누르거나 QR 코드를 통해 입금을
+                          - 위의 송금하기 버튼을 누르거나 QR 코드를 통해 입금을
                           완료해주세요!
                         </div>
                         <div>
@@ -838,6 +850,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+
       {/* 
 
       <div className="absolute bottom-0 flex flex-col justify-center align-items font-light text-center text-xs pb-4">

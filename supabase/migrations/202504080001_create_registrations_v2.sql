@@ -1,34 +1,38 @@
 -- 뚱땅뚱땅 밴드 두번째 공연 (2025년 5월 30일) 참가신청 테이블
-CREATE TABLE IF NOT EXISTS public.registrations_v2 (
+-- 코드(app/page.tsx, app/admin/page.tsx)와 컬럼명이 일치하도록 camelCase 사용
+CREATE TABLE IF NOT EXISTS public.registrations (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL,
     phone TEXT NOT NULL,
     referrer TEXT NOT NULL,
     companions INTEGER DEFAULT 0,
     confirmed BOOLEAN DEFAULT false,
-    join_party BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    "joinParty" BOOLEAN DEFAULT false,
+    arrived BOOLEAN DEFAULT false,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- RLS policies
-ALTER TABLE public.registrations_v2 ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
 
--- Everyone can insert
-CREATE POLICY "Anyone can insert registrations_v2" ON public.registrations_v2
+-- 누구나 신청(insert) 가능
+CREATE POLICY "Anyone can insert registrations" ON public.registrations
     FOR INSERT WITH CHECK (true);
 
--- Everyone can read (for confirmation lookup)
-CREATE POLICY "Anyone can read registrations_v2" ON public.registrations_v2
+-- 누구나 조회(select) 가능 (참가 확정 여부 확인용)
+CREATE POLICY "Anyone can read registrations" ON public.registrations
     FOR SELECT USING (true);
 
--- Only service role can update/delete
-CREATE POLICY "Service role can update registrations_v2" ON public.registrations_v2
-    FOR UPDATE USING (auth.role() = 'service_role');
+-- 어드민 페이지에서 confirmed/arrived 토글이 가능해야 하므로 anon update 허용
+-- (admin 페이지는 ?admin=true 쿼리 파라미터로만 접근하는 운영용)
+CREATE POLICY "Anyone can update registrations" ON public.registrations
+    FOR UPDATE USING (true);
 
-CREATE POLICY "Service role can delete registrations_v2" ON public.registrations_v2
+-- 삭제는 service_role만
+CREATE POLICY "Service role can delete registrations" ON public.registrations
     FOR DELETE USING (auth.role() = 'service_role');
 
--- Index for phone + name lookup
-CREATE INDEX idx_registrations_v2_phone ON public.registrations_v2(phone);
-CREATE INDEX idx_registrations_v2_name ON public.registrations_v2(name);
+-- phone + name 조회 인덱스
+CREATE INDEX idx_registrations_phone ON public.registrations(phone);
+CREATE INDEX idx_registrations_name ON public.registrations(name);
