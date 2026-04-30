@@ -259,8 +259,8 @@ export default function Home() {
       <div className="flex justify-center items-center h-screen bg-white ">
         <div
           className="relative  bg-white
+          max-w-[390px]
           
-          sm:w-[390px] sm:h-[844px] sm:border-8  sm:border-gray-800 overflow-x-hidden overflow-y-auto   transition-all ease-in-out sm:rounded-[55px]
           w-full h-full "
         >
           <Swiper
@@ -275,11 +275,11 @@ export default function Home() {
             }}
             className="w-[100vw] h-[70vh] sm:w-[390px] sm:h-[70%] z-2"
           >
-            {[1, 2].map((item, idx) => (
+            {[1].map((item, idx) => (
               <SwiperSlide key={item + idx}>
                 <img
                   src={`/band${item}.png`}
-                  className="h-full w-full object-contain z-2"
+                  className="h-full w-full object-cover z-2"
                   alt={item.toString()}
                 />
               </SwiperSlide>
@@ -297,7 +297,7 @@ export default function Home() {
               onClick={(e) => {
                 e.preventDefault();
                 const eventTitle = "뚱땅뚱땅 밴드 두번째 공연";
-                const eventLocation = "강남역 스타이즈본";
+                const eventLocation = "클럽 라이브앤라우드";
                 const eventDate = "2025-05-30T19:00:00";
 
                 // iOS의 경우
@@ -336,16 +336,16 @@ export default function Home() {
             </a>
           </div>
           <div className="flex items-center justify-between w-full gap-2 px-4 text-md text-gray-600">
-            <span className=" mt-2 text-center ">강남역 스타이즈본</span>
+            <span className=" mt-2 text-center ">클럽 라이브앤라우드</span>
             <div className="flex items-center rounded-sm gap-2">
               <a
-                href="nmap://search?query=스타이즈본 강남&appname=뚱땅뚱땅밴드"
+                href="nmap://search?query=클럽 라이브앤라우드&appname=뚱땅뚱땅밴드"
                 onClick={(e) => {
                   e.preventDefault();
                   const naverMapUrl = /Android|iPhone|iPad|iPod/i.test(
                     navigator.userAgent,
                   )
-                    ? "nmap://search?query=스타이즈본 강남&appname=뚱땅뚱땅밴드"
+                    ? "nmap://search?query=클럽 라이브앤라우드&appname=뚱땅뚱땅밴드"
                     : "https://map.naver.com/p/search/스타이즈본%20강남";
                   window.location.href = naverMapUrl;
                 }}
@@ -358,14 +358,14 @@ export default function Home() {
                 />
               </a>
               <a
-                href="kakaomap://search?q=스타이즈본 강남"
+                href="kakaomap://search?q=클럽 라이브앤라우드"
                 onClick={(e) => {
                   e.preventDefault();
                   const kakaoMapUrl = /Android|iPhone|iPad|iPod/i.test(
                     navigator.userAgent,
                   )
-                    ? "kakaomap://search?q=스타이즈본 강남"
-                    : "https://map.kakao.com/?q=스타이즈본 강남";
+                    ? "kakaomap://search?q=클럽 라이브앤라우드"
+                    : "https://map.kakao.com/?q=클럽 라이브앤라우드";
                   window.location.href = kakaoMapUrl;
                 }}
                 className="flex items-center gap-1 rounded-sm text-sm mt-1 hover:text-yellow-500 cursor-pointer"
@@ -529,23 +529,20 @@ export default function Home() {
               - 신청 시 입력하는 정보가 틀리지 않도록, 정확하게 확인해주세요!
             </div>
             <div>
-              - <b>공연 참여 확정의 절차로 5,000원</b> 입금 부탁드립니다. 1잔의
+              - <b>공연 참여 확정의 절차로 10,000원</b> 입금 부탁드립니다. 1잔의
               Free Drink와 멋진 공연으로 돌려드리겠습니다
             </div>
-            <div>
-              - 공연이 종료된 후 해당 공간에서 <b>송년회겸 뒤풀이</b>를 진행할
-              예정이니 모두 즐겁게 즐겨주세요
-            </div>
+            <div>- 공연이 종료된 후 근처에서 뒤풀이가 진행될 예정입니다.</div>
             <div>
               - 오시는 순서대로 입장을 도와드릴 예정이며,{" "}
               <b>먼저 오시는 분들은 앉아서 관람</b>하실 수 있다는 고급정보를
               전달드립니다
             </div>
-            <div>
+            {/* <div>
               - 뚱땅뚱땅하게 예쁜 포스터를 만들어준{" "}
               <b>신정초등학교 5학년 9반 친구들</b>께 이 영광을 바칩니다.{" "}
               <span className="line-through">5959 예뻐라 자란다 자란다</span>
-            </div>
+            </div> */}
           </div>
 
           <div ref={formRef} className="w-full px-4 pt-8 bg-gray-50">
@@ -780,6 +777,12 @@ export default function Home() {
                           className="p-2 border rounded"
                           required
                         />
+                        {Boolean(formData.companions) && (
+                          <div>
+                            {formData.name}님 외 {formData.companions}명, 총{" "}
+                            {formData.companions + 1} 명이 참여 예정입니다
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -830,7 +833,7 @@ export default function Home() {
           )} */}
 
           <div className="flex flex-col justify-center align-items font-light text-center text-xs py-4 ">
-            <div>Copyright © 2024 DDOONG DDANG BAND.</div>
+            <div>Copyright © 2026 DDOONG DDANG BAND.</div>
             <div> All rights reserved.</div>
           </div>
         </div>

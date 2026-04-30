@@ -1,7 +1,0 @@
-{
-  "tool_name": "WebFetch",
-  "tool_input_preview": "{\"url\":\"https://www.npmjs.com/package/next\",\"prompt\":\"What is the latest stable version of Next.js?\"}",
-  "error": "Request failed with status code 403",
-  "timestamp": "2026-04-08T12:14:53.194Z",
-  "retry_count": 1
-}
