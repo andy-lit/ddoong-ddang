@@ -26,6 +26,9 @@ interface RegisteralInfo {
 
 const STORAGE_KEY = "STORAGE_KEY";
 const FORM_DRAFT_KEY = "DDOONG_FORM_DRAFT";
+const TRANSFER_BANK_NAME = "토스뱅크";
+const TRANSFER_ACCOUNT_NO = "100081506475";
+const TICKET_PRICE = 10000;
 const getYoutubeId = (url: string) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
@@ -71,6 +74,7 @@ const downloadEventIcs = () => {
 export default function Home() {
   const [activeMusic, setActiveMusic] = useState<MusicInfoItem | null>(null);
   const [playerState, setPlayerState] = useState<PlayerState>("paused");
+  const [copiedTransferField, setCopiedTransferField] = useState<string | null>(null);
 
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
   const playerRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
@@ -249,6 +253,12 @@ export default function Home() {
     setPlayerState("paused");
   };
 
+  const copyTransferInfo = async (label: string, value: string) => {
+    await navigator.clipboard.writeText(value);
+    setCopiedTransferField(label);
+    window.setTimeout(() => setCopiedTransferField(null), 1200);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -356,41 +366,61 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center relative">
+      <div aria-hidden className="pointer-events-none fixed -left-[9999px] top-0 h-[54px] w-24 opacity-0">
+        {musicInfo.map((music) => {
+          const youtubeId = getYoutubeId(music.youtubeUrl);
+
+          return (
+            <iframe
+              ref={(node) => {
+                playerRefs.current[youtubeId] = node;
+              }}
+              key={youtubeId}
+              title={`${music.title} 재생 플레이어`}
+              src={getYoutubeEmbedSrc(music.youtubeUrl)}
+              className="h-[54px] w-24"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          );
+        })}
+      </div>
       <div
         className={`fixed top-3 left-1/2 z-50 w-[calc(100vw-24px)] max-w-[390px] -translate-x-1/2 rounded-2xl border border-gray-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur transition-opacity ${
           activeMusic ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
         <div className="flex items-center gap-3">
-          <div className="relative h-[54px] w-24 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
+          <div className="relative h-[54px] w-[54px] flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
+            {activeMusic && (
+              <img
+                src={activeMusic.imageUrl}
+                alt={`${activeMusic.title} 앨범아트`}
+                className="h-full w-full object-cover"
+              />
+            )}
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-x-0 bottom-2 flex items-end justify-center gap-1">
+              {[0, 1, 2, 3].map((bar) => (
+                <span
+                  key={bar}
+                  className={`w-1 rounded-full bg-white/90 ${
+                    playerState === "playing" ? "animate-pulse" : ""
+                  }`}
+                  style={{
+                    height: `${10 + bar * 4}px`,
+                    animationDelay: `${bar * 120}ms`,
+                    animationDuration: `${650 + bar * 90}ms`,
+                  }}
+                />
+              ))}
+            </div>
             {playerState === "loading" && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 bg-gray-100 text-[10px] font-medium text-gray-500">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 bg-gray-100/90 text-[10px] font-medium text-gray-500">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
                 로딩중
               </div>
             )}
-            {musicInfo.map((music) => {
-              const youtubeId = getYoutubeId(music.youtubeUrl);
-              const isActive = activeYoutubeId === youtubeId;
-
-              return (
-                <iframe
-                  ref={(node) => {
-                    playerRefs.current[youtubeId] = node;
-                  }}
-                  key={youtubeId}
-                  title={`${music.title} 재생 플레이어`}
-                  src={getYoutubeEmbedSrc(music.youtubeUrl)}
-                  className={
-                    isActive
-                      ? "h-full w-full"
-                      : "pointer-events-none fixed -left-[9999px] top-0 h-[54px] w-24 opacity-0"
-                  }
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              );
-            })}
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-400">
@@ -712,27 +742,68 @@ export default function Home() {
                   {!confirmed ? (
                     <>
                       {(() => {
-                        const tossUrl = `supertoss://send?amount=${
-                          10000 * (1 + formData.companions)
-                        }&bank=%ED%86%A0%EC%8A%A4%EB%B1%85%ED%81%AC&accountNo=100081506475&origin=qr`;
-                        const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=480x480&data=${encodeURIComponent(
-                          tossUrl,
-                        )}`;
+                        const transferAmount = TICKET_PRICE * (1 + formData.companions);
+                        const tossUrl = `supertoss://send?amount=${transferAmount}&bank=%ED%86%A0%EC%8A%A4%EB%B1%85%ED%81%AC&accountNo=${TRANSFER_ACCOUNT_NO}&origin=qr`;
+                        const transferRows = [
+                          { label: "은행명", value: TRANSFER_BANK_NAME },
+                          { label: "계좌번호", value: TRANSFER_ACCOUNT_NO },
+                          { label: "금액", value: `${transferAmount.toLocaleString()}원` },
+                        ];
+
                         return (
-                          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col items-center gap-4">
-                            <img
-                              src={qrSrc}
-                              alt="QR Code"
-                              className="w-48 h-48"
-                            />
+                          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col gap-4">
+                            <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4 flex flex-col gap-3">
+                              {transferRows.map((row) => (
+                                <div key={row.label} className="flex items-center justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <div className="text-[11px] font-medium text-gray-400">{row.label}</div>
+                                    <div className="text-sm font-semibold text-gray-900 truncate">{row.value}</div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    aria-label={`${row.label} 복사하기`}
+                                    className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
+                                    onClick={() => copyTransferInfo(row.label, row.value)}
+                                  >
+                                    {copiedTransferField === row.label ? (
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.8}
+                                        stroke="currentColor"
+                                        className="h-4 w-4 text-green-600"
+                                      >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                      </svg>
+                                    ) : (
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="h-4 w-4"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+                                        />
+                                      </svg>
+                                    )}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
                             <button
                               type="button"
-                              className="h-12 w-full rounded-xl font-medium tracking-tight bg-black text-white hover:bg-gray-800 active:scale-[0.99] transition"
+                              className="h-12 w-full rounded-xl font-medium tracking-tight bg-[#0064FF] text-white hover:bg-[#0056DB] active:scale-[0.99] transition"
                               onClick={() => {
                                 window.location.href = tossUrl;
                               }}
                             >
-                              송금하기
+                              토스로 송금하기
                             </button>
                             <button
                               type="button"
@@ -767,7 +838,7 @@ export default function Home() {
                             )}
                             <b>
                               {(
-                                10000 *
+                                TICKET_PRICE *
                                 (1 + formData.companions)
                               ).toLocaleString()}
                               원
@@ -777,7 +848,7 @@ export default function Home() {
                               후원의 의미로 더 주신다면, 그건 정말 감사합니다
                             </span>
                           </span>,
-                          "위의 송금하기 버튼을 누르거나 QR 코드를 통해 입금을 완료해주세요!",
+                          "위의 토스로 송금하기 버튼을 누르거나 계좌번호를 복사해 입금을 완료해주세요!",
                           "입금 확인이 수동으로 이뤄지는 관계로 즉각 반영되지는 않지만, 공연날까지는 확정 안내문을 보실 수 있도록 할게요!",
                           "문제가 생길 경우 기재해주신 연락처로 연락을 드리겠습니다! 혹은 밴드 내 지인을 통해 연락드리도록 하겠습니다!",
                         ].map((text, idx) => (
