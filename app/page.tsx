@@ -25,6 +25,7 @@ interface RegisteralInfo {
 }
 
 const STORAGE_KEY = "STORAGE_KEY";
+const FORM_DRAFT_KEY = "DDOONG_FORM_DRAFT";
 const getYoutubeId = (url: string) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
@@ -94,9 +95,35 @@ export default function Home() {
               });
             }
           });
+        return;
+      }
+    }
+
+    // 등록 정보가 없으면 입력 중이던 draft 복원
+    const draft = localStorage.getItem(FORM_DRAFT_KEY);
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        setFormData((prev) => ({ ...prev, ...parsed }));
+      } catch {
+        localStorage.removeItem(FORM_DRAFT_KEY);
       }
     }
   }, []);
+
+  // 폼 입력값을 localStorage에 자동 저장 (등록 전에만)
+  useEffect(() => {
+    if (hasStoredData) return;
+    const isEmpty =
+      !formData.name &&
+      !formData.phone &&
+      !formData.referrer &&
+      !formData.companions &&
+      !formData.joinParty &&
+      !formData.hasCompanions;
+    if (isEmpty) return;
+    localStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(formData));
+  }, [formData, hasStoredData]);
 
   useEffect(() => {
     if (!submitButtonRef.current) return;
@@ -167,6 +194,7 @@ export default function Home() {
       const usersStoredData = storedData?.[0];
       if (usersStoredData) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(usersStoredData));
+        localStorage.removeItem(FORM_DRAFT_KEY);
         setHasStoredData(true);
         setIsConfirmationVisible(true);
         setConfirmed(usersStoredData.confirmed);
@@ -186,6 +214,7 @@ export default function Home() {
       if (error) throw error;
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data[0]));
+      localStorage.removeItem(FORM_DRAFT_KEY);
       setIsConfirmationVisible(true);
       setHasStoredData(true);
 
@@ -255,14 +284,12 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center relative ">
-      <div className="flex justify-center items-center h-screen bg-white ">
+    <main className="flex min-h-screen flex-col items-center justify-center relative">
+      <div className="flex justify-center items-center min-h-screen bg-white">
         <div
-          className="relative  bg-white
-          max-w-[390px]
-          
-          w-full h-full "
+          className="relative bg-white max-w-[390px] w-full"
         >
+          {/* Hero Swiper */}
           <Swiper
             modules={[Autoplay, Pagination]}
             pagination={{
@@ -286,38 +313,56 @@ export default function Home() {
             ))}
           </Swiper>
 
-          <div className="text-2xl mt-8 mb-6 font-bold text-center">
+          {/* Title */}
+          <div className="text-2xl mt-8 mb-6 font-bold text-center tracking-tight px-5">
             뚱땅뚱땅 밴드 두번째 공연
           </div>
 
-          <div className="mt-2 text-center flex items-center justify-between w-full px-4 text-md text-gray-600 gap-2">
-            2025년 5월 30일(토) 오후 7시
+          {/* Date row */}
+          <div className="mt-2 flex items-center justify-between w-full px-5 text-sm text-gray-700 gap-2">
+            <span>2025년 5월 30일(토) 오후 7시</span>
             <a
               href="#"
               onClick={(e) => {
                 e.preventDefault();
                 const eventTitle = "뚱땅뚱땅 밴드 두번째 공연";
                 const eventLocation = "클럽 라이브앤라우드";
-                const eventDate = "2025-05-30T19:00:00";
-
-                // iOS의 경우
-                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                  const encodedTitle = encodeURIComponent(eventTitle);
-                  const encodedLocation = encodeURIComponent(eventLocation);
-                  window.location.href = `calshow://?title=${encodedTitle}&location=${encodedLocation}&startdate=${eventDate}`;
-                }
-                // Android의 경우
-                else if (/Android/i.test(navigator.userAgent)) {
-                  const startTime = new Date(eventDate).getTime();
-                  const endTime = startTime + 2 * 60 * 60 * 1000; // 2시간 후
-                  window.location.href = `content://com.android.calendar/time/${startTime}?title=${encodeURIComponent(
-                    eventTitle,
-                  )}&description=공연&location=${encodeURIComponent(
-                    eventLocation,
-                  )}&begin=${startTime}&end=${endTime}`;
-                }
+                const start = new Date("2025-05-30T19:00:00+09:00");
+                const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+                const fmt = (d: Date) =>
+                  d
+                    .toISOString()
+                    .replace(/[-:]/g, "")
+                    .replace(/\.\d{3}/, "");
+                const ics = [
+                  "BEGIN:VCALENDAR",
+                  "VERSION:2.0",
+                  "PRODID:-//ddoong-ddang//KR",
+                  "CALSCALE:GREGORIAN",
+                  "BEGIN:VEVENT",
+                  `UID:ddoong-ddang-2025-05-30@litcorp.xyz`,
+                  `DTSTAMP:${fmt(new Date())}`,
+                  `DTSTART:${fmt(start)}`,
+                  `DTEND:${fmt(end)}`,
+                  `SUMMARY:${eventTitle}`,
+                  `LOCATION:${eventLocation}`,
+                  "END:VEVENT",
+                  "END:VCALENDAR",
+                ].join("\r\n");
+                const blob = new Blob([ics], {
+                  type: "text/calendar;charset=utf-8",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "ddoong-ddang.ics";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
               }}
-              className="flex items-center gap-1 text-sm hover:text-blue-500 cursor-pointer"
+              aria-label="캘린더에 추가"
+              className="h-9 w-9 rounded-full bg-gray-100 hover:bg-gray-200 transition grid place-items-center flex-shrink-0 text-gray-600"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -325,7 +370,7 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-5 h-5"
               >
                 <path
                   strokeLinecap="round"
@@ -335,9 +380,12 @@ export default function Home() {
               </svg>
             </a>
           </div>
-          <div className="flex items-center justify-between w-full gap-2 px-4 text-md text-gray-600">
-            <span className=" mt-2 text-center ">클럽 라이브앤라우드</span>
-            <div className="flex items-center rounded-sm gap-2">
+
+          {/* Location row */}
+          <div className="flex items-center justify-between w-full gap-2 px-5 mt-2 text-sm text-gray-700">
+            <span>클럽 라이브앤라우드</span>
+            <div className="flex items-center gap-2">
+              {/* Naver Map pill */}
               <a
                 href="nmap://search?query=클럽 라이브앤라우드&appname=뚱땅뚱땅밴드"
                 onClick={(e) => {
@@ -349,14 +397,23 @@ export default function Home() {
                     : "https://map.naver.com/p/search/스타이즈본%20강남";
                   window.location.href = naverMapUrl;
                 }}
-                className="flex items-center gap-1 text-sm mt-1 hover:text-blue-500 cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 h-8 rounded-full text-xs font-medium border bg-green-50 text-green-700 border-green-200 hover:bg-green-100 transition"
               >
-                <img
-                  src="https://i.namu.wiki/i/g1ObOjgHeGx6qsTX-DgwrwyHL8uHBhXxiPQTCu9w5M32o0po4v1ugu_ikoEIncrVO-kq3Q73lCs8MzRgH55G2A.webp"
-                  alt="네이버 지도"
-                  className="w-6 h- rounded-sm"
-                />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-3 h-3"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M11.54 22.351l.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-2.083 3.708-5.101 3.708-9.027a8.25 8.25 0 0 0-16.5 0c0 3.926 1.764 6.944 3.708 9.027a19.58 19.58 0 0 0 2.683 2.282 16.975 16.975 0 0 0 1.144.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                N
               </a>
+              {/* Kakao Map pill */}
               <a
                 href="kakaomap://search?q=라이브앤라우드"
                 onClick={(e) => {
@@ -368,124 +425,148 @@ export default function Home() {
                     : "https://map.kakao.com/?q=라이브앤라우드";
                   window.location.href = kakaoMapUrl;
                 }}
-                className="flex items-center gap-1 rounded-sm text-sm mt-1 hover:text-yellow-500 cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 h-8 rounded-full text-xs font-medium border bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100 transition"
               >
-                <img
-                  src="https://play-lh.googleusercontent.com/pPTTNz433EYFurg2j__bFU5ONdMoU_bs_-yS2JLZriua3iHrksGP6XBPF5VtDPlpGcW4"
-                  alt="카카오 지도"
-                  className="w-6 h-6 rounded-sm"
-                />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-3 h-3"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M11.54 22.351l.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-2.083 3.708-5.101 3.708-9.027a8.25 8.25 0 0 0-16.5 0c0 3.926 1.764 6.944 3.708 9.027a19.58 19.58 0 0 0 2.683 2.282 16.975 16.975 0 0 0 1.144.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                K
               </a>
             </div>
           </div>
+
           {/* <div className="p-4">
             <NaverMap />
           </div> */}
 
-          <div className="text-lg mt-12 px-4 mb-2">SESSION</div>
-          <div className="flex flex-col px-4 items-start justify-center">
+          {/* SESSION section */}
+          <div className="mt-10 px-5 mb-3">
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-400 font-semibold">
+              SESSION
+            </p>
+          </div>
+          <div className="flex flex-col px-5 items-start justify-center gap-1">
             {userInfo.map((user, idx) => (
               <div
                 key={user.name + idx}
-                className="flex items-center w-full justify-between gap-4 mb-2"
+                className="flex items-center w-full justify-between hover:bg-gray-50 rounded-xl px-2 py-2 -mx-2 transition"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <img
                     src={`/${user.name}.png`}
                     alt={user.name}
-                    className="w-16 h-16 rounded-md"
+                    className="w-[72px] h-[72px] rounded-xl object-cover"
                   />
-
-                  <div className="flex flex-col justify-between h-full">
-                    <div>{user.name}</div>
-                    <div className="text-sm text-gray-500">{user.session}</div>
+                  <div className="flex flex-col justify-center gap-0.5">
+                    <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                    <div className="text-xs text-gray-500">{user.session}</div>
                   </div>
                 </div>
-                <div>
-                  <button
-                    // href={`instagram://user?username=${user.instagram}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const instagramUrl = /Android|iPhone|iPad|iPod/i.test(
-                        navigator.userAgent,
-                      )
-                        ? `instagram://user?username=${user.instagram}`
-                        : `https://instagram.com/${user.instagram}`;
-                      window.location.href = instagramUrl;
-                    }}
-                    className="hover:text-pink-500"
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const instagramUrl = /Android|iPhone|iPad|iPod/i.test(
+                      navigator.userAgent,
+                    )
+                      ? `instagram://user?username=${user.instagram}`
+                      : `https://instagram.com/${user.instagram}`;
+                    window.location.href = instagramUrl;
+                  }}
+                  aria-label={`${user.name} 인스타그램`}
+                  className="text-gray-400 hover:text-pink-500 transition p-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-6 h-6"
-                      fill="currentColor"
-                      strokeWidth={0.5}
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                    </svg>
-                  </button>
-                </div>
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                  </svg>
+                </button>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-row items-center justify-between mt-12 px-4 mb-2">
-            <div className="text-lg ">PLAYLIST</div>
-            <div className=" font-light text-xs  ">
-              재생까지 조금 시간이 걸릴 수 있어요
-            </div>
+          {/* PLAYLIST section */}
+          <div className="mt-10 px-5 mb-3 flex items-center justify-between">
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-400 font-semibold">
+              PLAYLIST
+            </p>
+            <span className="text-xs text-gray-400 font-light">재생까지 조금 시간이 걸릴 수 있어요</span>
           </div>
-          <div className="flex flex-col px-4 items-start justify-center">
+          <div className="flex flex-col px-5 items-start justify-center gap-1">
             {musicInfo.map((music, idx) => (
               <div
                 key={music.title + idx}
-                className="flex items-center w-full justify-between gap-4 mb-2"
+                className="flex items-center w-full justify-between hover:bg-gray-50 rounded-xl px-2 py-2 -mx-2 transition"
               >
-                <div className="flex items-center gap-2">
-                  <div className="text-sm flex flex-col items-start justify-between h-full">
-                    <div className="">{music.title}</div>
-                    <div className="text-sm text-gray-400 ">{music.artist}</div>
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={music.imageUrl}
+                      alt={music.title}
+                      className="w-[72px] h-[72px] rounded-xl object-cover"
+                    />
+                    <button
+                      onClick={() => togglePlay(music.youtubeUrl)}
+                      aria-label={isPlaying[music.youtubeUrl] ? "일시정지" : "재생"}
+                      className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl hover:bg-black/50 transition-all"
+                    >
+                      {isPlaying[music.youtubeUrl] ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="white"
+                          className="w-7 h-7"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="white"
+                          className="w-7 h-7"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                    <iframe
+                      ref={(el) => {
+                        if (el) playerRefs.current[music.youtubeUrl] = el;
+                      }}
+                      src={`https://www.youtube.com/embed/${music.youtubeUrl}?enablejsapi=1`}
+                      className="hidden"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
                   </div>
-                </div>
-                <div className="relative">
-                  <img
-                    src={music.imageUrl}
-                    alt={music.title}
-                    className="w-16 h-16 rounded-md"
-                  />
-                  <button
-                    onClick={() => togglePlay(music.youtubeUrl)}
-                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-md hover:bg-opacity-50 transition-all"
-                  >
-                    {isPlaying[music.youtubeUrl] ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="white"
-                        viewBox="0 0 24 24"
-                        className="w-8 h-8"
-                      >
-                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="white"
-                        viewBox="0 0 24 24"
-                        className="w-8 h-8"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    )}
-                  </button>
-                  <iframe
-                    ref={(el) => {
-                      if (el) playerRefs.current[music.youtubeUrl] = el;
-                    }}
-                    src={`https://www.youtube.com/embed/${music.youtubeUrl}?enablejsapi=1`}
-                    className="hidden"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
+                  <div className="flex flex-col justify-center gap-0.5">
+                    <div className="text-sm font-medium text-gray-900">{music.title}</div>
+                    <div className="text-xs text-gray-500">{music.artist}</div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -511,33 +592,29 @@ export default function Home() {
             </div>
           )}
 
-          <div className="text-lg mt-12 px-4 mb-2">NOTICE</div>
-          <div className="flex flex-col px-4 items-start justify-center text-sm text-gray-600 mb-8 gap-2">
-            <div>
-              - 소중한 주말에 시간 내어주셔서 감사합니다. 최선을 다해 좋은 시간
-              되실 수 있게 노력하겠습니다.
-            </div>
-            <div>
-              - 다만 초보 밴드이니만큼 부족한 모습이 보이더라도 따뜻한 격려
-              보내주시면 감사하겠습니다
-            </div>
-            <div>
-              - 공연장 공간 확보 및 원활한 행사 진행을 위해{" "}
-              <b>사전 신청한 인원만 입장이 가능</b>합니다.
-            </div>
-            <div>
-              - 신청 시 입력하는 정보가 틀리지 않도록, 정확하게 확인해주세요!
-            </div>
-            <div>
-              - <b>공연 참여 확정의 절차로 10,000원</b> 입금 부탁드립니다. 1잔의
-              Free Drink와 멋진 공연으로 돌려드리겠습니다
-            </div>
-            <div>- 공연이 종료된 후 근처에서 뒤풀이가 진행될 예정입니다.</div>
-            <div>
-              - 오시는 순서대로 입장을 도와드릴 예정이며,{" "}
-              <b>먼저 오시는 분들은 앉아서 관람</b>하실 수 있다는 고급정보를
-              전달드립니다
-            </div>
+          {/* NOTICE section */}
+          <div className="mt-10 px-5 mb-3">
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-400 font-semibold">
+              NOTICE
+            </p>
+          </div>
+          <div className="flex flex-col px-5 items-start justify-center text-sm text-gray-600 mb-8 gap-3">
+            {[
+              "소중한 주말에 시간 내어주셔서 감사합니다. 최선을 다해 좋은 시간 되실 수 있게 노력하겠습니다.",
+              "다만 초보 밴드이니만큼 부족한 모습이 보이더라도 따뜻한 격려 보내주시면 감사하겠습니다",
+              <span key="only-pre">공연장 공간 확보 및 원활한 행사 진행을 위해 <b>사전 신청한 인원만 입장이 가능</b>합니다.</span>,
+              "신청 시 입력하는 정보가 틀리지 않도록, 정확하게 확인해주세요!",
+              <span key="fee"><b>공연 참여 확정의 절차로 10,000원</b> 입금 부탁드립니다. 1잔의 Free Drink와 멋진 공연으로 돌려드리겠습니다</span>,
+              "공연이 종료된 후 근처에서 뒤풀이가 진행될 예정입니다.",
+              <span key="early">오시는 순서대로 입장을 도와드릴 예정이며, <b>먼저 오시는 분들은 앉아서 관람</b>하실 수 있다는 고급정보를 전달드립니다</span>,
+            ].map((text, idx) => (
+              <div key={idx} className="flex items-start gap-2.5">
+                <span className="mt-[3px] flex-shrink-0 w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 block" />
+                </span>
+                <span>{text}</span>
+              </div>
+            ))}
             {/* <div>
               - 뚱땅뚱땅하게 예쁜 포스터를 만들어준{" "}
               <b>신정초등학교 5학년 9반 친구들</b>께 이 영광을 바칩니다.{" "}
@@ -545,9 +622,12 @@ export default function Home() {
             </div> */}
           </div>
 
-          <div ref={formRef} className="w-full px-4 pt-8 bg-gray-50">
-            <div className="text-lg mb-2">
-              {isConfirmationVisible ? "CHECK-IN" : "REGISTRATION"}
+          {/* REGISTRATION / CHECK-IN section */}
+          <div ref={formRef} className="w-full px-5 pt-8 pb-2 bg-gray-50">
+            <div className="mb-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-400 font-semibold">
+                {isConfirmationVisible ? "CHECK-IN" : "REGISTRATION"}
+              </p>
             </div>
             <form
               onSubmit={
@@ -557,7 +637,7 @@ export default function Home() {
             >
               {isConfirmationVisible && hasStoredData ? (
                 <>
-                  <div>
+                  <div className="text-sm text-gray-700">
                     <b>{formData.name}님</b>{" "}
                     {formData.companions > 0
                       ? `외 ${formData.companions}명의 `
@@ -574,70 +654,69 @@ export default function Home() {
                           tossUrl,
                         )}`;
                         return (
-                          <>
+                          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col items-center gap-4">
                             <img
                               src={qrSrc}
                               alt="QR Code"
-                              className="w-full"
+                              className="w-48 h-48"
                             />
                             <button
-                              className="w-full py-2 bg-black text-white"
+                              className="h-12 w-full rounded-xl font-medium tracking-tight bg-black text-white hover:bg-gray-800 active:scale-[0.99] transition"
                               onClick={() => {
                                 window.location.href = tossUrl;
                               }}
                             >
                               송금하기
                             </button>
-                          </>
+                          </div>
                         );
                       })()}
-                      <div className="text-sm text-gray-600 gap-2">
-                        <div>
-                          - 참여 확정을 위해{" "}
-                          {formData.hasCompanions && (
-                            <span>
-                              총 {formData.companions + 1}명의 입장료{" "}
+                      <div className="text-sm text-gray-600 flex flex-col gap-2">
+                        {[
+                          <span key="amount">
+                            참여 확정을 위해{" "}
+                            {formData.hasCompanions && (
+                              <span>총 {formData.companions + 1}명의 입장료 </span>
+                            )}
+                            <b>
+                              {(
+                                10000 *
+                                (1 + formData.companions)
+                              ).toLocaleString()}
+                              원
+                            </b>
+                            을 입금 부탁드립니다.{" "}
+                            <span className="line-through">
+                              후원의 의미로 더 주신다면, 그건 정말 감사합니다
                             </span>
-                          )}
-                          <b>
-                            {(
-                              10000 *
-                              (1 + formData.companions)
-                            ).toLocaleString()}
-                            원
-                          </b>
-                          을 입금 부탁드립니다.{" "}
-                          <span className="line-through">
-                            후원의 의미로 더 주신다면, 그건 정말 감사합니다
-                          </span>
-                        </div>
-                        <div>
-                          - 위의 송금하기 버튼을 누르거나 QR 코드를 통해 입금을
-                          완료해주세요!
-                        </div>
-                        <div>
-                          - 입금 확인이 수동으로 이뤄지는 관계로 즉각 반영되지는
-                          않지만, 공연날까지는 확정 안내문을 보실 수 있도록
-                          할게요!
-                        </div>
-                        <div>
-                          - 문제가 생길 경우 기재해주신 연락처로 연락을
-                          드리겠습니다! 혹은 밴드 내 지인을 통해 연락드리도록
-                          하겠습니다!
-                        </div>
+                          </span>,
+                          "위의 송금하기 버튼을 누르거나 QR 코드를 통해 입금을 완료해주세요!",
+                          "입금 확인이 수동으로 이뤄지는 관계로 즉각 반영되지는 않지만, 공연날까지는 확정 안내문을 보실 수 있도록 할게요!",
+                          "문제가 생길 경우 기재해주신 연락처로 연락을 드리겠습니다! 혹은 밴드 내 지인을 통해 연락드리도록 하겠습니다!",
+                        ].map((text, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5">
+                            <span className="mt-[3px] flex-shrink-0 w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center">
+                              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 block" />
+                            </span>
+                            <span>{text}</span>
+                          </div>
+                        ))}
                       </div>
                     </>
                   ) : (
-                    <div className="text-sm text-gray-600 gap-2">
-                      <div>
-                        - 입금이 확인되어, <b>참여 확정</b>이 되셨습니다!
+                    <div className="text-sm text-gray-600 flex flex-col gap-2">
+                      <div className="flex items-start gap-2.5">
+                        <span className="mt-[3px] flex-shrink-0 w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gray-400 block" />
+                        </span>
+                        <span>입금이 확인되어, <b>참여 확정</b>이 되셨습니다!</span>
                       </div>
                     </div>
                   )}
                 </>
               ) : (
                 <>
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1.5">
                     <label
                       htmlFor="name"
                       className="text-sm font-medium text-gray-700"
@@ -655,12 +734,12 @@ export default function Home() {
                           name: e.target.value,
                         }))
                       }
-                      className="p-2 border rounded"
+                      className="px-4 h-12 w-full border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition placeholder:text-gray-400 text-sm"
                       required
                     />
                   </div>
 
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1.5">
                     <label
                       htmlFor="phone"
                       className="text-sm font-medium text-gray-700"
@@ -681,7 +760,7 @@ export default function Home() {
                           }));
                         }
                       }}
-                      className="p-2 border rounded"
+                      className="px-4 h-12 w-full border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition placeholder:text-gray-400 text-sm"
                       required
                       maxLength={13}
                       pattern="[0-9]{3}-[0-9]{3,4}-[0-9]{4}"
@@ -693,7 +772,7 @@ export default function Home() {
 
               {!isConfirmationVisible && (
                 <>
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1.5">
                     <label
                       htmlFor="referrer"
                       className="text-sm font-medium text-gray-700"
@@ -709,7 +788,7 @@ export default function Home() {
                           referrer: e.target.value,
                         }))
                       }
-                      className="p-2 border rounded"
+                      className="px-4 h-12 w-full border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition text-sm text-gray-700"
                       required
                     >
                       <option value="">누구 지인이신가요?</option>
@@ -733,7 +812,7 @@ export default function Home() {
                             joinParty: e.target.checked,
                           }));
                         }}
-                        className="w-4 h-4"
+                        className="accent-black w-4 h-4 rounded"
                       />
                       <label
                         htmlFor="joinParty"
@@ -756,7 +835,7 @@ export default function Home() {
                             companions: e.target.checked ? prev.companions : 0,
                           }));
                         }}
-                        className="w-4 h-4"
+                        className="accent-black w-4 h-4 rounded"
                       />
                       <label
                         htmlFor="hasCompanions"
@@ -767,7 +846,7 @@ export default function Home() {
                     </div>
 
                     {formData.hasCompanions && (
-                      <div className="flex flex-col gap-1 ml-6">
+                      <div className="flex flex-col gap-1.5 ml-6">
                         <label
                           htmlFor="companions"
                           className="text-sm font-medium text-gray-700"
@@ -778,19 +857,20 @@ export default function Home() {
                           id="companions"
                           type="number"
                           min="1"
+                          inputMode="numeric"
                           placeholder="1"
-                          value={formData.companions}
+                          value={formData.companions || ""}
                           onChange={(e) =>
                             setFormData((prev) => ({
                               ...prev,
                               companions: parseInt(e.target.value) || 0,
                             }))
                           }
-                          className="p-2 border rounded"
+                          className="px-4 h-12 w-full border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition placeholder:text-gray-400 text-sm"
                           required
                         />
                         {Boolean(formData.companions) && (
-                          <div>
+                          <div className="text-sm text-gray-600">
                             {formData.name}님 외 {formData.companions}명, 총{" "}
                             {formData.companions + 1} 명이 참여 예정입니다
                           </div>
@@ -807,7 +887,7 @@ export default function Home() {
                     type="submit"
                     disabled={isSubmitting}
                     ref={submitButtonRef}
-                    className="p-3 bg-black text-white rounded disabled:bg-gray-400 mt-2"
+                    className="h-12 w-full rounded-xl font-medium tracking-tight bg-black text-white hover:bg-gray-800 active:scale-[0.99] transition disabled:bg-gray-300 mt-2"
                   >
                     {isSubmitting ? "제출 중..." : "신청결과 확인하기"}
                   </button>
@@ -817,7 +897,7 @@ export default function Home() {
                   type="submit"
                   disabled={isSubmitting}
                   ref={submitButtonRef}
-                  className="p-3 bg-black text-white rounded disabled:bg-gray-400 mt-2"
+                  className="h-12 w-full rounded-xl font-medium tracking-tight bg-black text-white hover:bg-gray-800 active:scale-[0.99] transition disabled:bg-gray-300 mt-2"
                 >
                   {isSubmitting ? "제출 중..." : "신청하기"}
                 </button>
@@ -844,14 +924,15 @@ export default function Home() {
             </button>
           )} */}
 
-          <div className="flex flex-col justify-center align-items font-light text-center text-xs py-4 ">
-            <div>Copyright © 2026 DDOONG DDANG BAND.</div>
-            <div> All rights reserved.</div>
+          {/* Footer */}
+          <div className="flex flex-col justify-center items-center font-light text-center text-xs py-5 text-gray-400">
+            <div>Copyright &copy; 2026 DDOONG DDANG BAND.</div>
+            <div>All rights reserved.</div>
           </div>
         </div>
       </div>
 
-      {/* 
+      {/*
 
       <div className="absolute bottom-0 flex flex-col justify-center align-items font-light text-center text-xs pb-4">
         <div>Copyright © DDOONG DDANG BAND. All rights reserved.</div>
