@@ -709,12 +709,12 @@ export default function Home() {
                       htmlFor="name"
                       className="text-sm font-medium text-gray-700"
                     >
-                      이름이 어떻게 되세요?
+                      이름
                     </label>
                     <input
                       id="name"
                       type="text"
-                      placeholder="정확한 이름을 입력해주세요"
+                      placeholder="실명을 입력해주세요"
                       value={formData.name}
                       onChange={(e) =>
                         setFormData((prev) => ({
@@ -732,7 +732,7 @@ export default function Home() {
                       htmlFor="phone"
                       className="text-sm font-medium text-gray-700"
                     >
-                      전화번호가 어떻게 되세요?
+                      전화번호
                     </label>
                     <input
                       id="phone"
@@ -765,7 +765,7 @@ export default function Home() {
                       htmlFor="referrer"
                       className="text-sm font-medium text-gray-700"
                     >
-                      누구의 지인이신가요?
+                      지인
                     </label>
                     <select
                       id="referrer"
@@ -779,7 +779,7 @@ export default function Home() {
                       className="px-4 h-12 w-full border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition text-sm text-gray-700"
                       required
                     >
-                      <option value="">누구 지인이신가요?</option>
+                      <option value="">선택해주세요</option>
                       {userInfo.map((user) => (
                         <option key={user.name} value={user.name}>
                           {user.name}
@@ -788,30 +788,35 @@ export default function Home() {
                     </select>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <input
-                        id="joinParty"
-                        type="checkbox"
-                        checked={formData.joinParty}
-                        onChange={(e) => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            joinParty: e.target.checked,
-                          }));
-                        }}
-                        className="accent-black w-4 h-4 rounded"
-                      />
-                      <label
-                        htmlFor="joinParty"
-                        className="text-sm font-medium text-gray-700"
-                      >
-                        뒤풀이에 참석하시겠어요?
-                      </label>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="joinParty"
+                    className="flex items-center justify-between gap-3 h-12 px-4 rounded-xl border border-gray-200 bg-white cursor-pointer hover:bg-gray-50 transition"
+                  >
+                    <span className="text-sm font-medium text-gray-700">
+                      뒤풀이 참석
+                    </span>
+                    <input
+                      id="joinParty"
+                      type="checkbox"
+                      checked={formData.joinParty}
+                      onChange={(e) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          joinParty: e.target.checked,
+                        }));
+                      }}
+                      className="accent-black w-5 h-5 rounded shrink-0"
+                    />
+                  </label>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor="hasCompanions"
+                      className="flex items-center justify-between gap-3 h-12 px-4 rounded-xl border border-gray-200 bg-white cursor-pointer hover:bg-gray-50 transition"
+                    >
+                      <span className="text-sm font-medium text-gray-700">
+                        동반인원 있음
+                      </span>
                       <input
                         id="hasCompanions"
                         type="checkbox"
@@ -823,23 +828,20 @@ export default function Home() {
                             companions: e.target.checked ? prev.companions : 0,
                           }));
                         }}
-                        className="accent-black w-4 h-4 rounded"
+                        className="accent-black w-5 h-5 rounded shrink-0"
                       />
-                      <label
-                        htmlFor="hasCompanions"
-                        className="text-sm font-medium text-gray-700"
-                      >
-                        동반인원이 있으신가요?(본인을 제외한 인원이 있을 경우)
-                      </label>
-                    </div>
+                    </label>
 
                     {formData.hasCompanions && (
-                      <div className="flex flex-col gap-1.5 ml-6">
+                      <div className="flex flex-col gap-1.5 mt-1">
                         <label
                           htmlFor="companions"
                           className="text-sm font-medium text-gray-700"
                         >
-                          동반 인원 수(본인을 제외한 인원 수를 입력해주세요)
+                          동반 인원 수
+                          <span className="text-xs font-normal text-gray-400 ml-1">
+                            (본인 제외)
+                          </span>
                         </label>
                         <input
                           id="companions"
@@ -858,9 +860,9 @@ export default function Home() {
                           required
                         />
                         {Boolean(formData.companions) && (
-                          <div className="text-sm text-gray-600">
-                            {formData.name}님 외 {formData.companions}명, 총{" "}
-                            {formData.companions + 1} 명이 참여 예정입니다
+                          <div className="text-xs text-gray-500 mt-0.5">
+                            {formData.name || "본인"} 외 {formData.companions}
+                            명, 총 {formData.companions + 1}명 참여
                           </div>
                         )}
                       </div>
