@@ -32,6 +32,9 @@ const getYoutubeId = (url: string) => {
   return match && match[2].length === 11 ? match[2] : url;
 };
 
+type MusicInfoItem = (typeof musicInfo)[number];
+type PlayerState = "loading" | "playing" | "paused";
+
 const downloadEventIcs = () => {
   const eventTitle = "뚱땅뚱땅 밴드 두번째 공연";
   const eventLocation = "클럽 라이브앤라우드";
@@ -66,10 +69,11 @@ const downloadEventIcs = () => {
 };
 
 export default function Home() {
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-  const [activeYoutubeId, setActiveYoutubeId] = useState<string | null>(null);
+  const [activeMusic, setActiveMusic] = useState<MusicInfoItem | null>(null);
+  const [playerState, setPlayerState] = useState<PlayerState>("paused");
 
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
+  const playerRef = useRef<HTMLIFrameElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -172,16 +176,13 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const createYoutubeEmbedSrc = (youtubeUrl: string, shouldAutoplay = false) => {
+  const getYoutubeEmbedSrc = (youtubeUrl: string) => {
     const params = new URLSearchParams({
+      autoplay: "1",
       enablejsapi: "1",
       playsinline: "1",
       rel: "0",
     });
-
-    if (shouldAutoplay) {
-      params.set("autoplay", "1");
-    }
 
     if (typeof window !== "undefined") {
       params.set("origin", window.location.origin);
@@ -190,11 +191,38 @@ export default function Home() {
     return `https://www.youtube.com/embed/${getYoutubeId(youtubeUrl)}?${params.toString()}`;
   };
 
-  const togglePlay = (youtubeUrl: string) => {
-    const youtubeId = getYoutubeId(youtubeUrl);
-    setActiveYoutubeId((currentId) =>
-      currentId === youtubeId ? null : youtubeId,
+  const sendPlayerCommand = (func: "playVideo" | "pauseVideo") => {
+    playerRef.current?.contentWindow?.postMessage(
+      JSON.stringify({
+        event: "command",
+        func,
+      }),
+      "*",
     );
+  };
+
+  const handleMusicClick = (music: MusicInfoItem) => {
+    const youtubeId = getYoutubeId(music.youtubeUrl);
+    const activeYoutubeId = activeMusic ? getYoutubeId(activeMusic.youtubeUrl) : null;
+
+    if (activeYoutubeId === youtubeId) {
+      if (playerState === "playing" || playerState === "loading") {
+        sendPlayerCommand("pauseVideo");
+        setPlayerState("paused");
+      } else {
+        sendPlayerCommand("playVideo");
+        setPlayerState("playing");
+      }
+      return;
+    }
+
+    setActiveMusic(music);
+    setPlayerState("loading");
+  };
+
+  const closePlayer = () => {
+    setActiveMusic(null);
+    setPlayerState("paused");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -302,6 +330,49 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center relative">
+      {activeMusic && (
+        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-24px)] max-w-[390px] rounded-2xl border border-gray-200 bg-white/95 shadow-lg backdrop-blur px-3 py-2">
+          <div className="flex items-center gap-3">
+            <div className="relative h-[54px] w-24 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
+              {playerState === "loading" && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 bg-gray-100 text-[10px] font-medium text-gray-500">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
+                  로딩중
+                </div>
+              )}
+              <iframe
+                ref={playerRef}
+                key={getYoutubeId(activeMusic.youtubeUrl)}
+                title={`${activeMusic.title} 재생 플레이어`}
+                src={getYoutubeEmbedSrc(activeMusic.youtubeUrl)}
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                onLoad={() => setPlayerState("playing")}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-400">
+                Now Playing
+              </div>
+              <div className="truncate text-sm font-semibold text-gray-900">
+                {activeMusic.title}
+              </div>
+              <div className="truncate text-xs text-gray-500">
+                {activeMusic.artist}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={closePlayer}
+              aria-label="재생바 닫기"
+              className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex justify-center items-center min-h-screen bg-white">
         <div
           className="relative bg-white max-w-[390px] w-full"
@@ -478,8 +549,10 @@ export default function Home() {
           </div>
           <div className="flex flex-col px-5 items-start justify-center gap-1">
             {musicInfo.map((music, idx) => {
-              const youtubeId = getYoutubeId(music.youtubeUrl);
-              const isActive = activeYoutubeId === youtubeId;
+              const isActive =
+                activeMusic !== null &&
+                getYoutubeId(activeMusic.youtubeUrl) === getYoutubeId(music.youtubeUrl);
+              const isPlaying = isActive && playerState !== "paused";
 
               return (
                 <div
@@ -497,11 +570,11 @@ export default function Home() {
                       className="w-[72px] h-[72px] rounded-xl object-cover"
                     />
                     <button
-                      onClick={() => togglePlay(music.youtubeUrl)}
-                      aria-label={isActive ? "일시정지" : "재생"}
+                      onClick={() => handleMusicClick(music)}
+                      aria-label={isPlaying ? "일시정지" : "재생"}
                       className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl hover:bg-black/50 transition-all"
                     >
-                      {isActive ? (
+                      {isPlaying ? (
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
@@ -533,38 +606,11 @@ export default function Home() {
                         </svg>
                       )}
                     </button>
-                    {isActive && (
-                      <iframe
-                        title={`${music.title} 재생 플레이어`}
-                        src={createYoutubeEmbedSrc(music.youtubeUrl, true)}
-                        className="absolute left-0 top-0 h-px w-px opacity-0 pointer-events-none"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    )}
                   </div>
                 </div>
               );
             })}
           </div>
-
-          {selectedVideo && (
-            <div
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-              onClick={() => setSelectedVideo(null)}
-            >
-              <div className="w-full h-full sm:w-[80%] sm:h-[60%] max-w-3xl p-4">
-                <div className="relative pt-[56.25%] w-full h-0">
-                  <iframe
-                    className="absolute top-0 left-0 w-full h-full"
-                    src={createYoutubeEmbedSrc(selectedVideo, true)}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* NOTICE section */}
           <div className="mt-10 px-5 mb-3">
