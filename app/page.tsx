@@ -549,7 +549,7 @@ export default function Home() {
                     navigator.userAgent,
                   )
                     ? "nmap://search?query=클럽 라이브앤라우드&appname=뚱땅뚱땅밴드"
-                    : "https://map.naver.com/p/search/스타이즈본%20강남";
+                    : "https://map.naver.com/p/search/클럽%20라이브앤라우드";
                   window.location.href = naverMapUrl;
                 }}
                 aria-label="네이버 지도에서 보기"
