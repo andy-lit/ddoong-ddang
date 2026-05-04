@@ -94,6 +94,14 @@ export default function Home() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+
+  useEffect(() => {
+    const onScroll = () => setIsAtTop(window.scrollY < 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     // URL에서 id 파라미터 확인
@@ -1127,6 +1135,31 @@ export default function Home() {
       <div className="absolute bottom-0 flex flex-col justify-center align-items font-light text-center text-xs pb-4">
         <div>Copyright © DDOONG DDANG BAND. All rights reserved.</div>
       </div> */}
+
+      <div
+        aria-hidden="true"
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center gap-1 transition-opacity duration-300 ${
+          isAtTop ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <span className="text-[11px] text-gray-500 tracking-wide bg-white/80 backdrop-blur px-2.5 py-1 rounded-full border border-gray-200 shadow-sm">
+          아래로 스크롤
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+          className="w-4 h-4 text-gray-500 animate-bounce"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m19.5 8.25-7.5 7.5-7.5-7.5"
+          />
+        </svg>
+      </div>
     </main>
   );
 }
