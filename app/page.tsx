@@ -470,13 +470,13 @@ export default function Home() {
               pauseOnMouseEnter: true,
               stopOnLastSlide: true,
             }}
-            className="w-[100vw] h-[70vh] sm:w-[390px] sm:h-[70%] z-2"
+            className="w-full aspect-[941/1672] z-2"
           >
             {[1].map((item, idx) => (
               <SwiperSlide key={item + idx}>
                 <img
                   src={`/band${item}.png`}
-                  className="h-full w-full object-cover z-2"
+                  className="h-full w-full object-contain z-2"
                   alt={item.toString()}
                 />
               </SwiperSlide>
