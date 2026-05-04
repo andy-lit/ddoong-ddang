@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     description: "5월 30일(토) 18:30, 라이브앤라우드",
     type: "website",
     url: "https://ddoong-ddang.vercel.app",
-    images: ["/og.jpg"],
+    images: ["/og-v2.jpg"],
   },
 };
 
@@ -39,7 +39,7 @@ export default function RootLayout({
         <meta property="og:title" content={"뚱땅뚱땅 밴드 공연"} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={"https://ddoong-ddang.vercel.app"} />
-        <meta property="og:image" content={"/og.jpg"} />
+        <meta property="og:image" content={"/og-v2.jpg"} />
         <meta
           property="og:description"
           content="5월 30일(토) 18:30, 라이브앤라우드"
