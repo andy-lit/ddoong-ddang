@@ -521,6 +521,11 @@ export default function Home() {
                   strokeLinejoin="round"
                   d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
                 />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 12.75v4.5m-2.25-2.25h4.5"
+                />
               </svg>
             </a>
           </div>
@@ -616,7 +621,7 @@ export default function Home() {
                     }
                   }}
                   aria-label={`${user.name} 인스타그램`}
-                  className="text-gray-400 hover:text-pink-500 transition p-1"
+                  className="text-gray-400 hover:text-pink-500 transition p-1 -mr-1"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1138,20 +1143,32 @@ export default function Home() {
 
       <div
         aria-hidden="true"
-        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center gap-1 transition-opacity duration-300 ${
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center transition-opacity duration-300 animate-bounce ${
           isAtTop ? "opacity-100" : "opacity-0"
         }`}
+        style={{ filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.4))" }}
       >
-        <span className="text-[11px] text-gray-500 tracking-wide bg-white/80 backdrop-blur px-2.5 py-1 rounded-full border border-gray-200 shadow-sm">
-          아래로 스크롤
-        </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          strokeWidth={2}
+          strokeWidth={2.5}
           stroke="currentColor"
-          className="w-4 h-4 text-gray-500 animate-bounce"
+          className="w-8 h-8 text-white"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m19.5 8.25-7.5 7.5-7.5-7.5"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2.5}
+          stroke="currentColor"
+          className="w-8 h-8 text-white/50 -mt-4"
         >
           <path
             strokeLinecap="round"
