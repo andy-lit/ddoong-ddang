@@ -39,7 +39,7 @@ type MusicInfoItem = (typeof musicInfo)[number];
 type PlayerState = "loading" | "playing" | "paused";
 
 const downloadEventIcs = () => {
-  const eventTitle = "뚱땅뚱땅 밴드 두번째 공연";
+  const eventTitle = "뚱땅뚱땅 밴드 공연";
   const eventLocation = "클럽 라이브앤라우드";
   const start = new Date("2025-05-30T18:30:00+09:00");
   const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
@@ -485,7 +485,7 @@ export default function Home() {
 
           {/* Title */}
           <div className="text-2xl mt-8 mb-6 font-bold text-center tracking-tight px-5">
-            뚱땅뚱땅 밴드 두번째 공연
+            뚱땅뚱땅 밴드 공연
           </div>
 
           {/* Date row */}
