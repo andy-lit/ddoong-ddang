@@ -44,7 +44,10 @@ const downloadEventIcs = () => {
   const start = new Date("2025-05-30T18:30:00+09:00");
   const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
   const fmt = (d: Date) =>
-    d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    d
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -74,7 +77,9 @@ const downloadEventIcs = () => {
 export default function Home() {
   const [activeMusic, setActiveMusic] = useState<MusicInfoItem | null>(null);
   const [playerState, setPlayerState] = useState<PlayerState>("paused");
-  const [copiedTransferField, setCopiedTransferField] = useState<string | null>(null);
+  const [copiedTransferField, setCopiedTransferField] = useState<string | null>(
+    null,
+  );
 
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
   const playerRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
@@ -231,7 +236,9 @@ export default function Home() {
 
   const handleMusicClick = (music: MusicInfoItem) => {
     const youtubeId = getYoutubeId(music.youtubeUrl);
-    const activeYoutubeId = activeMusic ? getYoutubeId(activeMusic.youtubeUrl) : null;
+    const activeYoutubeId = activeMusic
+      ? getYoutubeId(activeMusic.youtubeUrl)
+      : null;
 
     if (activeYoutubeId === youtubeId) {
       if (playerState === "playing" || playerState === "loading") {
@@ -370,7 +377,9 @@ export default function Home() {
     }
   };
 
-  const activeYoutubeId = activeMusic ? getYoutubeId(activeMusic.youtubeUrl) : null;
+  const activeYoutubeId = activeMusic
+    ? getYoutubeId(activeMusic.youtubeUrl)
+    : null;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center relative">
@@ -464,9 +473,7 @@ export default function Home() {
         </div>
       </div>
       <div className="flex justify-center items-center min-h-screen bg-white">
-        <div
-          className="relative bg-white max-w-[390px] w-full"
-        >
+        <div className="relative bg-white max-w-[390px] w-full">
           {/* Hero Swiper */}
           <Swiper
             modules={[Autoplay, Pagination]}
@@ -587,11 +594,11 @@ export default function Home() {
               SESSION
             </p>
           </div>
-          <div className="flex flex-col px-5 items-start justify-center gap-1">
+          <div className="flex flex-col pl-6 pr-2 items-start justify-center gap-1">
             {userInfo.map((user, idx) => (
               <div
                 key={user.name + idx}
-                className="flex items-center w-full justify-between hover:bg-gray-50 rounded-xl px-2 py-2 -mx-2 transition"
+                className="flex items-center w-full justify-between hover:bg-gray-50 rounded-xl  py-2 -mx-2 transition"
               >
                 <div className="flex items-center gap-3">
                   <img
@@ -600,7 +607,9 @@ export default function Home() {
                     className="w-[72px] h-[72px] rounded-xl object-cover"
                   />
                   <div className="flex flex-col justify-center gap-0.5">
-                    <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {user.name}
+                    </div>
                     <div className="text-xs text-gray-500">{user.session}</div>
                   </div>
                 </div>
@@ -642,21 +651,26 @@ export default function Home() {
               PLAYLIST
             </p>
           </div>
-          <div className="flex flex-col px-5 items-start justify-center gap-1">
+          <div className="flex flex-col pl-6 pr-2 items-start justify-center gap-1">
             {musicInfo.map((music, idx) => {
               const isActive =
                 activeMusic !== null &&
-                getYoutubeId(activeMusic.youtubeUrl) === getYoutubeId(music.youtubeUrl);
+                getYoutubeId(activeMusic.youtubeUrl) ===
+                  getYoutubeId(music.youtubeUrl);
               const isPlaying = isActive && playerState !== "paused";
 
               return (
                 <div
                   key={music.title + idx}
-                  className="flex items-center w-full justify-between gap-3 hover:bg-gray-50 rounded-xl px-2 py-2 -mx-2 transition"
+                  className="flex items-center w-full justify-between gap-3 hover:bg-gray-50 rounded-xl py-2 -mx-2 transition"
                 >
                   <div className="flex flex-col justify-center gap-0.5 min-w-0 flex-1">
-                    <div className="text-sm font-medium text-gray-900 truncate">{music.title}</div>
-                    <div className="text-xs text-gray-500 truncate">{music.artist}</div>
+                    <div className="text-sm font-medium text-gray-900 truncate">
+                      {music.title}
+                    </div>
+                    <div className="text-xs text-gray-500 truncate">
+                      {music.artist}
+                    </div>
                   </div>
                   <div className="relative flex-shrink-0">
                     <img
@@ -722,11 +736,21 @@ export default function Home() {
             {[
               "소중한 주말에 시간 내어주셔서 감사합니다. 최선을 다해 좋은 시간 되실 수 있게 노력하겠습니다.",
               "다만 초보 밴드이니만큼 부족한 모습이 보이더라도 따뜻한 격려 보내주시면 감사하겠습니다",
-              <span key="only-pre">공연장 공간 확보 및 원활한 행사 진행을 위해 <b>사전 신청한 인원만 입장이 가능</b>합니다.</span>,
+              <span key="only-pre">
+                공연장 공간 확보 및 원활한 행사 진행을 위해{" "}
+                <b>사전 신청한 인원만 입장이 가능</b>합니다.
+              </span>,
               "신청 시 입력하는 정보가 틀리지 않도록, 정확하게 확인해주세요!",
-              <span key="fee"><b>공연 참여 확정의 절차로 10,000원</b> 입금 부탁드립니다. 1잔의 Free Drink와 멋진 공연으로 돌려드리겠습니다</span>,
+              <span key="fee">
+                <b>공연 참여 확정의 절차로 10,000원</b> 입금 부탁드립니다. 1잔의
+                Free Drink와 멋진 공연으로 돌려드리겠습니다
+              </span>,
               "공연이 종료된 후 근처에서 뒤풀이가 진행될 예정입니다.",
-              <span key="early">오시는 순서대로 입장을 도와드릴 예정이며, <b>먼저 오시는 분들은 앉아서 관람</b>하실 수 있다는 고급정보를 전달드립니다</span>,
+              <span key="early">
+                오시는 순서대로 입장을 도와드릴 예정이며,{" "}
+                <b>먼저 오시는 분들은 앉아서 관람</b>하실 수 있다는 고급정보를
+                전달드립니다
+              </span>,
             ].map((text, idx) => (
               <div key={idx} className="flex items-start gap-2.5">
                 <span className="mt-[3px] flex-shrink-0 w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -767,7 +791,8 @@ export default function Home() {
                   {!confirmed ? (
                     <>
                       {(() => {
-                        const transferAmount = TICKET_PRICE * (1 + formData.companions);
+                        const transferAmount =
+                          TICKET_PRICE * (1 + formData.companions);
                         const tossUrl = `supertoss://send?amount=${transferAmount}&bank=%ED%86%A0%EC%8A%A4%EB%B1%85%ED%81%AC&accountNo=${TRANSFER_ACCOUNT_NO}&origin=qr`;
                         const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=480x480&data=${encodeURIComponent(
                           tossUrl,
@@ -782,12 +807,19 @@ export default function Home() {
                             />
                             <div className="w-full rounded-2xl bg-gray-50 border border-gray-100 p-4">
                               <div className="mb-3 flex items-center justify-between gap-3">
-                                <div className="text-[11px] font-medium text-gray-400">송금 정보</div>
+                                <div className="text-[11px] font-medium text-gray-400">
+                                  송금 정보
+                                </div>
                                 <button
                                   type="button"
                                   aria-label="계좌번호 복사하기"
                                   className="inline-flex h-8 flex-shrink-0 items-center gap-1.5 rounded-full bg-white px-3 text-xs font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
-                                  onClick={() => copyTransferInfo("계좌번호", TRANSFER_ACCOUNT_NO)}
+                                  onClick={() =>
+                                    copyTransferInfo(
+                                      "계좌번호",
+                                      TRANSFER_ACCOUNT_NO,
+                                    )
+                                  }
                                 >
                                   {copiedTransferField === "계좌번호" ? (
                                     <>
@@ -799,7 +831,11 @@ export default function Home() {
                                         stroke="currentColor"
                                         className="h-4 w-4 text-green-600"
                                       >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="m4.5 12.75 6 6 9-13.5"
+                                        />
                                       </svg>
                                       복사됨
                                     </>
@@ -827,15 +863,21 @@ export default function Home() {
                               <div className="grid gap-2 text-sm">
                                 <div className="flex items-center justify-between gap-4">
                                   <span className="text-gray-400">은행</span>
-                                  <span className="font-semibold text-gray-900">{TRANSFER_BANK_NAME}</span>
+                                  <span className="font-semibold text-gray-900">
+                                    {TRANSFER_BANK_NAME}
+                                  </span>
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                   <span className="text-gray-400">계좌</span>
-                                  <span className="font-semibold text-gray-900">{TRANSFER_ACCOUNT_NO}</span>
+                                  <span className="font-semibold text-gray-900">
+                                    {TRANSFER_ACCOUNT_NO}
+                                  </span>
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                   <span className="text-gray-400">금액</span>
-                                  <span className="font-semibold text-gray-900">{transferAmount.toLocaleString()}원</span>
+                                  <span className="font-semibold text-gray-900">
+                                    {transferAmount.toLocaleString()}원
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -877,7 +919,9 @@ export default function Home() {
                           <span key="amount">
                             참여 확정을 위해{" "}
                             {formData.hasCompanions && (
-                              <span>총 {formData.companions + 1}명의 입장료 </span>
+                              <span>
+                                총 {formData.companions + 1}명의 입장료{" "}
+                              </span>
                             )}
                             <b>
                               {(
@@ -910,7 +954,9 @@ export default function Home() {
                         <span className="mt-[3px] flex-shrink-0 w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center">
                           <span className="w-1.5 h-1.5 rounded-full bg-gray-400 block" />
                         </span>
-                        <span>입금이 확인되어, <b>참여 확정</b>이 되셨습니다!</span>
+                        <span>
+                          입금이 확인되어, <b>참여 확정</b>이 되셨습니다!
+                        </span>
                       </div>
                     </div>
                   )}

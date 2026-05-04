@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"curl -sS -o /dev/null -w \\\"%{http_code}\\\\n\\\" \\\"https://syowzfsgrtqeavqvqmzf.supabase.co/rest/v1/\\\" -H \\\"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5b3d...",
+  "error": "Exit code 6\ncurl: (6) Could not resolve host: syowzfsgrtqeavqvqmzf.supabase.co\n000\n---\ncurl: (6) Could not resolve host: syowzfsgrtqeavqvqmzf.supabase.co\n000",
+  "timestamp": "2026-04-30T07:24:45.719Z",
+  "retry_count": 1
+}

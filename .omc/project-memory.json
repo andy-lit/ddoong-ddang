@@ -42,7 +42,7 @@
     "runtime": null
   },
   "build": {
-    "buildCommand": "pnpm build",
+    "buildCommand": "rm -rf .next && mv .env.local .env.local.bak && pnpm build 2>&1 | tail -15; mv .env.local.bak .env.local",
     "testCommand": null,
     "lintCommand": "pnpm lint",
     "devCommand": "pnpm dev",
@@ -140,9 +140,51 @@
   },
   "hotPaths": [
     {
+      "path": "app/page.tsx",
+      "accessCount": 54,
+      "lastAccessed": 1777862671490,
+      "type": "file"
+    },
+    {
+      "path": "app/layout.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1777861876307,
+      "type": "file"
+    },
+    {
+      "path": "app/utils/supabase.ts",
+      "accessCount": 4,
+      "lastAccessed": 1777535035622,
+      "type": "file"
+    },
+    {
+      "path": "app/admin/page.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1777535416825,
+      "type": "file"
+    },
+    {
       "path": "app/music-info.tsx",
       "accessCount": 2,
       "lastAccessed": 1777532195471,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/202504080001_create_registrations_v2.sql",
+      "accessCount": 2,
+      "lastAccessed": 1777533769019,
+      "type": "file"
+    },
+    {
+      "path": ".env.local",
+      "accessCount": 2,
+      "lastAccessed": 1777533921706,
+      "type": "file"
+    },
+    {
+      "path": "app/globals.css",
+      "accessCount": 2,
+      "lastAccessed": 1777535447222,
       "type": "file"
     }
   ],

@@ -1,1 +1,11 @@
 {"t":0,"agent":"ac52f22","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"ad53574","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a74b0b6","agent_type":"designer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a74b0b6","agent_type":"designer","event":"agent_stop","success":true,"duration_ms":204360}
+{"t":0,"agent":"a2b81e4","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a543b58","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"aeb8353","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a851319","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a420274","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a438dd3","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a4e67fb","agent_type":"unknown","event":"agent_stop","success":true}
