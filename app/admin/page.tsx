@@ -19,11 +19,96 @@ interface Registration {
 
 type StatusFilter = "all" | "unpaid" | "paid" | "notArrived" | "arrived";
 
+const ADMIN_AUTH_KEY = "DDOONG_ADMIN_AUTH";
+const ADMIN_ID = "dddd";
+const ADMIN_PW = "05301830";
+
 export default function Page() {
   return (
     <Suspense fallback={<div className="p-6 text-sm text-gray-500">로딩중…</div>}>
-      <AdminContent />
+      <AuthGate>
+        <AdminContent />
+      </AuthGate>
     </Suspense>
+  );
+}
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+  const [id, setId] = useState("");
+  const [pw, setPw] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    setIsAuthed(localStorage.getItem(ADMIN_AUTH_KEY) === "1");
+  }, []);
+
+  if (isAuthed === null) {
+    return <div className="p-6 text-sm text-gray-500">로딩중…</div>;
+  }
+
+  if (isAuthed) return <>{children}</>;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (id === ADMIN_ID && pw === ADMIN_PW) {
+      localStorage.setItem(ADMIN_AUTH_KEY, "1");
+      setIsAuthed(true);
+      setError("");
+    } else {
+      setError("아이디 또는 비밀번호가 올바르지 않습니다.");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-[360px] bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-4"
+      >
+        <div>
+          <h1 className="text-base font-semibold tracking-tight">어드민 로그인</h1>
+          <p className="text-xs text-gray-500 mt-1">
+            계속하려면 로그인이 필요합니다
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="admin-id" className="text-sm font-medium text-gray-700">
+            아이디
+          </label>
+          <input
+            id="admin-id"
+            type="text"
+            autoComplete="username"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            className="px-4 h-12 w-full border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition placeholder:text-gray-400 text-sm"
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="admin-pw" className="text-sm font-medium text-gray-700">
+            비밀번호
+          </label>
+          <input
+            id="admin-pw"
+            type="password"
+            autoComplete="current-password"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            className="px-4 h-12 w-full border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-900 transition placeholder:text-gray-400 text-sm"
+            required
+          />
+        </div>
+        {error && <div className="text-xs text-red-600">{error}</div>}
+        <button
+          type="submit"
+          className="h-12 rounded-xl font-medium tracking-tight bg-black text-white hover:bg-gray-800 active:scale-[0.99] transition"
+        >
+          로그인
+        </button>
+      </form>
+    </div>
   );
 }
 
