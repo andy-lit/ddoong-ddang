@@ -1189,39 +1189,45 @@ export default function Home() {
 
       <div
         aria-hidden="true"
-        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center transition-opacity duration-300 animate-bounce ${
+        className={`fixed inset-x-0 bottom-6 z-40 pointer-events-none flex justify-center transition-opacity duration-300 ${
           isAtTop ? "opacity-100" : "opacity-0"
         }`}
-        style={{ filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.4))" }}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2.5}
-          stroke="currentColor"
-          className="w-8 h-8 text-white"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m19.5 8.25-7.5 7.5-7.5-7.5"
-          />
-        </svg>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2.5}
-          stroke="currentColor"
-          className="w-8 h-8 text-white/50 -mt-4"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m19.5 8.25-7.5 7.5-7.5-7.5"
-          />
-        </svg>
+        <div className="w-full max-w-[390px] flex justify-center">
+          <div
+            className="flex flex-col items-center animate-bounce"
+            style={{ filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.4))" }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-8 h-8 text-white"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-8 h-8 text-white/50 -mt-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </div>
+        </div>
       </div>
     </main>
   );
