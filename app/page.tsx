@@ -505,7 +505,7 @@ export default function Home() {
 
           {/* Date row */}
           <div className="mt-2 flex items-center justify-between w-full px-5 text-sm text-gray-700 gap-2">
-            <span>2025년 5월 30일(토) 오후 6시 30분</span>
+            <span>2026년 5월 30일(토) 오후 6시 30분</span>
             <a
               href="#"
               onClick={(e) => {
